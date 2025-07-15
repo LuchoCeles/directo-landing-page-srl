@@ -57,7 +57,7 @@ const ContactSection: React.FC = () => {
       title: "WhatsApp",
       details: [
         { label: "Rosario", value: "+54 341 439-7465", link: "https://wa.me/+5493414397465" },
-        { label: "Mar del Plata", value: "+54 223 477-1190", link: "https://wa.me/+5492236838574" }
+        { label: "Mar del Plata", value: "+54 223 6838574", link: "https://wa.me/+5492236838574" }
       ]
     }
   ];
