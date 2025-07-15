@@ -3,7 +3,6 @@ import Navigation from './Navigation';
 import HeroSection from './HeroSection';
 import AboutSection from './AboutSection';
 import LocationsSection from './LocationsSection';
-import ScheduleSection from './ScheduleSection';
 import ContactSection from './ContactSection';
 import Footer from './Footer';
 
@@ -57,7 +56,6 @@ const TransporteLanding: React.FC = () => {
         <HeroSection onContactClick={handleContactClick} />
         <AboutSection />
         <LocationsSection />
-        <ScheduleSection />
         <ContactSection />
       </main>
       
