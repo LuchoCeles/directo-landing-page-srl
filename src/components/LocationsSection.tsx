@@ -5,7 +5,7 @@ const LocationsSection: React.FC = () => {
   const locations = [
     {
       city: "Rosario",
-      address: "Consultar dirección exacta",
+      address: "Sucre 1070",
       phone: "+54 341 439-7465",
       hours: {
         weekdays: "Lunes a Viernes: 7:30 - 15:30",
@@ -15,7 +15,7 @@ const LocationsSection: React.FC = () => {
     },
     {
       city: "Mar del Plata",
-      address: "Consultar dirección exacta",
+      address: "Teodoro Bronzini 2953",
       phone: "+54 223 477-1190",
       hours: {
         weekdays: "Lunes a Viernes: 8:00 - 16:00",
