@@ -9,7 +9,7 @@ const LocationsSection: React.FC = () => {
       phone: "+54 341 439-7465",
       hours: {
         weekdays: "Lunes a Viernes: 7:30 - 15:30",
-        saturday: "Sábados: 7:30 - 11:00",
+        saturday: "Sábados: 7:30 - 11:30",
         sunday: "Domingos: Cerrado"
       }
     },
