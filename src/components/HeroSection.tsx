@@ -9,7 +9,7 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/5493414397465', '_blank');
+    window.open('https://wa.me/+542235838574', '_blank');
   };
 
   return (
