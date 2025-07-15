@@ -56,8 +56,8 @@ const ContactSection: React.FC = () => {
       icon: <MessageCircle className="w-6 h-6 text-primary" />,
       title: "WhatsApp",
       details: [
-        { label: "Rosario", value: "+54 341 439-7465", link: "https://wa.me/+5493414397465" },
-        { label: "Mar del Plata", value: "+54 223 6838574", link: "https://wa.me/+5492236838574" }
+        { label: "Rosario", value: "+54 341439-7465", link: "https://wa.me/+543414397465" },
+        { label: "Mar del Plata", value: "+54 2235838574", link: "https://wa.me/+542235838574" }
       ]
     }
   ];
@@ -129,7 +129,7 @@ const ContactSection: React.FC = () => {
                 <Button 
                   variant="whatsapp" 
                   className="w-full justify-start gap-3"
-                  onClick={() => window.open('https://wa.me/+5492236838574', '_blank')}
+                  onClick={() => window.open('https://wa.me/+5492235838574', '_blank')}
                 >
                   <MessageCircle size={20} />
                   WhatsApp Mar del Plata

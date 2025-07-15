@@ -34,7 +34,7 @@ const LocationsSection: React.FC = () => {
           </h2>
           <div className="w-20 h-1 bg-gradient-primary mx-auto mb-8"></div>
           <p className="text-lg text-transport-gray max-w-2xl mx-auto">
-            Atendemos en nuestras dos sucursales estratégicas en Rosario y Mar del Plata. 
+            Atendemos en nuestras dos sucursales estratégicas en Rosario y Mar del Plata.
             Acercate a la que te quede más cómoda.
           </p>
         </div>
@@ -57,7 +57,7 @@ const LocationsSection: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-primary" />
-                  <a 
+                  <a
                     href={`tel:${location.phone}`}
                     className="text-transport-navy hover:text-primary transition-smooth font-medium"
                   >
@@ -82,19 +82,47 @@ const LocationsSection: React.FC = () => {
         </div>
 
         {/* Map placeholder */}
-        <div className="bg-card rounded-lg shadow-card p-8 text-center">
-          <div className="bg-transport-blue-subtle rounded-lg p-12 mb-6">
-            <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-transport-navy mb-2">
-              Mapa de Ubicaciones
-            </h3>
-            <p className="text-transport-gray">
-              Próximamente: Mapa interactivo con nuestras ubicaciones exactas
-            </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+
+          <div className="bg-card rounded-lg shadow-card p-6 text-center">
+            <div className="bg-transport-blue-subtle rounded-lg p-12 mb-4">
+              <MapPin className="w-10 h-10 text-primary mx-auto mb-2" />
+              <h3 className="text-xl font-semibold text-transport-navy mb-2">
+                Sucursal Mar del Plata
+              </h3>
+              <div className="w-full h-[300px]">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10668.789698399297!2d-57.592805002337836!3d-37.99549622443571!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9584d93ea488288d%3A0xaf6e9ff6aeeeb324!2sEl%20Directo!5e0!3m2!1ses-419!2sar!4v1721065757482!5m2!1ses-419!2sar"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+
+            </div>
           </div>
-          <p className="text-sm text-transport-gray">
-            Para conocer las direcciones exactas, contactanos directamente por teléfono o WhatsApp.
-          </p>
+
+          <div className="bg-card rounded-lg shadow-card p-6 text-center">
+            <div className="bg-transport-blue-subtle rounded-lg p-12 mb-4">
+              <MapPin className="w-10 h-10 text-primary mx-auto mb-2" />
+              <h3 className="text-xl font-semibold text-transport-navy mb-2">
+                Sucursal Rosario
+              </h3>
+              <div className="w-full h-[300px]">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10668.789698399297!2d-57.592805002337836!3d-37.99549622443571!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9584d93ea488288d%3A0xaf6e9ff6aeeeb324!2sEl%20Directo!5e0!3m2!1ses-419!2sar!4v1721065757482!5m2!1ses-419!2sar"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </section>

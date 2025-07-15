@@ -104,24 +104,6 @@ const Footer: React.FC = () => {
                 eldirecto@live.com.ar
               </a>
             </div>
-            <div className="flex gap-4">
-              <a 
-                href="https://wa.me/5493414397465" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-whatsapp hover:bg-whatsapp-dark px-4 py-2 rounded-lg text-white text-sm transition-smooth"
-              >
-                WhatsApp Rosario
-              </a>
-              <a 
-                href="https://wa.me/5492234771190" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-whatsapp hover:bg-whatsapp-dark px-4 py-2 rounded-lg text-white text-sm transition-smooth"
-              >
-                WhatsApp Mar del Plata
-              </a>
-            </div>
           </div>
         </div>
 
