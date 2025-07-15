@@ -15,7 +15,6 @@ const Navigation: React.FC<NavigationProps> = ({ activeSection, onNavigate }) =>
     { id: 'hero', label: 'Inicio' },
     { id: 'about', label: 'Nosotros' },
     { id: 'locations', label: 'Sucursales' },
-    { id: 'schedule', label: 'Horarios' },
     { id: 'contact', label: 'Contacto' }
   ];
 

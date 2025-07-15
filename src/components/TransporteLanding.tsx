@@ -11,7 +11,7 @@ const TransporteLanding: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'locations', 'schedule', 'contact'];
+      const sections = ['hero', 'about', 'locations', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
