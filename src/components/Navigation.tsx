@@ -38,12 +38,12 @@ const Navigation: React.FC<NavigationProps> = ({ activeSection, onNavigate }) =>
       isScrolled ? 'bg-background/95 backdrop-blur-md shadow-soft' : 'bg-transparent'
     }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 md:h-16">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <button 
               onClick={() => handleNavigate('hero')}
-              className="text-lg md:text-xl font-bold text-transport-navy hover:text-primary transition-smooth"
+              className="text-xl font-bold text-transport-navy hover:text-primary transition-smooth"
             >
               El Directo SRL
             </button>

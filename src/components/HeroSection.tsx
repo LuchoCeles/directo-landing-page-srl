@@ -13,7 +13,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center bg-gradient-hero">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center bg-gradient-hero pt-16 md:pt-0">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
