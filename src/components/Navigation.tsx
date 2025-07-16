@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface NavigationProps {
   activeSection: string;
@@ -37,12 +38,12 @@ const Navigation: React.FC<NavigationProps> = ({ activeSection, onNavigate }) =>
       isScrolled ? 'bg-background/95 backdrop-blur-md shadow-soft' : 'bg-transparent'
     }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20 md:h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <button 
               onClick={() => handleNavigate('hero')}
-              className="text-xl font-bold text-transport-navy hover:text-primary transition-smooth"
+              className="text-lg md:text-xl font-bold text-transport-navy hover:text-primary transition-smooth"
             >
               El Directo SRL
             </button>
@@ -67,39 +68,42 @@ const Navigation: React.FC<NavigationProps> = ({ activeSection, onNavigate }) =>
             </div>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu sheet */}
           <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </Button>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsMobileMenuOpen(true)}
+                >
+                  <Menu size={24} />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle className="text-left">Menú</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-2">
+                  {menuItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavigate(item.id)}
+                      className={`block w-full text-left px-4 py-3 text-lg font-medium rounded-lg transition-smooth hover:bg-transport-blue-subtle ${
+                        activeSection === item.id 
+                          ? 'text-primary bg-transport-blue-subtle border-l-4 border-primary' 
+                          : 'text-transport-gray hover:text-transport-navy'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-background/95 backdrop-blur-md border-t border-border">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavigate(item.id)}
-                className={`block w-full text-left px-3 py-2 text-base font-medium transition-smooth hover:text-primary ${
-                  activeSection === item.id 
-                    ? 'text-primary bg-transport-blue-subtle' 
-                    : 'text-transport-gray hover:text-transport-navy'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </nav>
   );
 };
