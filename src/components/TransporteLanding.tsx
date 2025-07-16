@@ -33,7 +33,7 @@ const TransporteLanding: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const offsetTop = element.offsetTop - 100; // Account for fixed navbar height
+      const offsetTop = element.offsetTop - 124; // Account for fixed navbar height + 1.5rem
       window.scrollTo({
         top: offsetTop,
         behavior: 'smooth'

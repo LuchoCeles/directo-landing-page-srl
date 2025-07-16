@@ -49,7 +49,7 @@ const ContactSection: React.FC = () => {
       icon: <Mail className="w-6 h-6 text-primary" />,
       title: "Email",
       details: [
-        { label: "Consultas generales", value: "eldirecto@live.com.ar", link: "mailto:eldirecto@live.com.ar" }
+        { label: "Consultas", value: "eldirecto@live.com.ar", link: "mailto:eldirecto@live.com.ar" }
       ]
     },
     {
