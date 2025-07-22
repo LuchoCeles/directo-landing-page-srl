@@ -29,7 +29,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
         <div className="max-w-4xl mx-auto">
           {/* Company Name */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-transport-navy mb-6 animate-fade-in">
-            Transporte
+            Transportadora
             <span className="block text-primary">El Directo SRL</span>
           </h1>
 
@@ -68,8 +68,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
               <div className="text-transport-gray">Años de experiencia</div>
             </div>
             <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6 shadow-soft">
-              <div className="text-3xl font-bold text-primary mb-2">2</div>
-              <div className="text-transport-gray">Sucursales principales</div>
+              <div className="text-3xl font-bold text-primary mb-2">+50.000 mil</div>
+              <div className="text-transport-gray">Entregas por año</div>
             </div>
             <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6 shadow-soft">
               <div className="text-3xl font-bold text-primary mb-2">100%</div>

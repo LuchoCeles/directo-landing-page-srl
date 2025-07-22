@@ -39,7 +39,7 @@ const AboutSection: React.FC = () => {
           {/* Text Content */}
           <div className="space-y-6">
             <p className="text-lg text-transport-gray leading-relaxed">
-              En <span className="font-semibold text-primary">Transporte El Directo SRL</span> contamos 
+              En <span className="font-semibold text-primary">Transportadora El Directo SRL</span> contamos 
               con más de tres décadas de experiencia brindando soluciones logísticas confiables en todo el país.
             </p>
             
