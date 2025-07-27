@@ -3,6 +3,8 @@ import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/
 import truckHero1 from "@/assets/truck-hero-1.jpg";
 import logisticsHero2 from "@/assets/logistics-hero-2.jpg";
 import fleetHero3 from "@/assets/fleet-hero-3.jpg";
+import { get } from 'http';
+import { log } from 'console';
 
 interface AdminContextType {
   isAuthenticated: boolean;
@@ -20,29 +22,7 @@ const API_URL = import.meta.env.VITE_LOCAL_API_URL;
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 const defaultAdminData: AdminData = {
-  carousel: [
-    {
-      id: '1',
-      imageUrl: truckHero1,
-      title: 'Transporte nacional de carga con más de 60 años de trayectoria',
-      description: 'Experiencia y confiabilidad en cada entrega',
-      order: 1
-    },
-    {
-      id: '2',
-      imageUrl: logisticsHero2,
-      title: 'Unidades modernas y monitoreadas para mayor seguridad',
-      description: 'Tecnología de vanguardia al servicio de su carga',
-      order: 2
-    },
-    {
-      id: '3',
-      imageUrl: fleetHero3,
-      title: 'Cobertura Rosario - Mar del Plata, con logística flexible',
-      description: 'Conectamos las principales ciudades de Argentina',
-      order: 3
-    }
-  ],
+  carousel: [],
   contact: {
     rosarioPhone: '+54 341 439‑7465',
     marDelPlataPhone: '+54 223 477‑1190',
@@ -94,8 +74,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
+
   const login = async (username: string, password: string): Promise<boolean> => {
-    try {   
+    try {
+
       const response = await fetch(`${API_URL}/admin/login`, {
         method: 'POST',
         headers: {
@@ -103,7 +85,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         },
         body: JSON.stringify({ username, password })
       })
-      
+
       if (!response.ok) {
         return false;
       }
@@ -115,7 +97,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       return false;
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Error durante el login:', error);
       return false;
     }
   };
@@ -124,6 +106,31 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsAuthenticated(false);
     localStorage.removeItem('transportadora_admin_auth');
   };
+
+  const getCarouselItem = async (): Promise<CarouselItem[]> => {
+    try {
+      const response = await fetch(`${API_URL}/admin/carrusel`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        console.error('Error al cargar el carousel:', response.statusText);
+        return [];
+      }
+      const data = await response.json();
+      return data as CarouselItem[];
+    } catch (error) {
+      console.error('Error cargando el carousel:', error);
+      return [];
+    }
+  }
+
+
+
 
   const saveAdminData = (newData: AdminData) => {
     setAdminData(newData);

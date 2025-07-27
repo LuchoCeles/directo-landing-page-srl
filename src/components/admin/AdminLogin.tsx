@@ -18,7 +18,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     // Simular delay de autenticación
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     const success = login(user,password);
 
