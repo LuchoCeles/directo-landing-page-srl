@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, Truck } from "lucide-react";
+import { Lock, Truck, User } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAdmin();
@@ -20,7 +21,7 @@ const AdminLogin = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const success = login(password);
-    
+
     if (success) {
       toast({
         title: "Acceso autorizado",
@@ -29,7 +30,7 @@ const AdminLogin = () => {
     } else {
       toast({
         title: "Acceso denegado",
-        description: "Contraseña incorrecta",
+        description: "Datos mal ingresados. Intente nuevamente.",
         variant: "destructive",
       });
     }
@@ -52,34 +53,51 @@ const AdminLogin = () => {
             </p>
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center space-x-2">
-                <Lock className="w-4 h-4" />
-                <span>Contraseña</span>
-              </label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Ingrese la contraseña"
-                className="border-border focus:ring-primary"
-                required
-                disabled={isLoading}
-              />
+              <div className="mb-6">
+                <label className="text-sm font-medium text-foreground flex items-center space-x-2 mb-2">
+                  <User className="w-4 h-4" />
+                  <span>Usuario</span>
+                </label>
+                <Input
+                  type="text"
+                  value={user}
+                  onChange={(e) => setUser(e.target.value)}
+                  placeholder="Ingrese la contraseña"
+                  className="border-border focus:ring-primary"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground flex items-center space-x-2 mb-2">
+                  <Lock className="w-4 h-4" />
+                  <span>Contraseña</span>
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Ingrese la contraseña"
+                  className="border-border focus:ring-primary"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full shadow-elegant" 
+
+            <Button
+              type="submit"
+              className="w-full shadow-elegant hover:text-white hover:bg-color-blue"
               disabled={isLoading}
             >
               {isLoading ? "Verificando..." : "Iniciar Sesión"}
             </Button>
           </form>
-          
+
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
               <strong>Demo:</strong> Contraseña: admin123
