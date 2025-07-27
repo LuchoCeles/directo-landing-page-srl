@@ -20,9 +20,9 @@ const AdminLogin = () => {
     // Simular delay de autenticación
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const success = login(password);
+    const success = login(user,password);
 
-    if (success) {
+    if (!success) {
       toast({
         title: "Acceso autorizado",
         description: "Bienvenido al panel administrativo",
@@ -66,7 +66,7 @@ const AdminLogin = () => {
                   type="text"
                   value={user}
                   onChange={(e) => setUser(e.target.value)}
-                  placeholder="Ingrese la contraseña"
+                  placeholder="Ingrese el usuario"
                   className="border-border focus:ring-primary"
                   required
                   disabled={isLoading}
@@ -100,7 +100,10 @@ const AdminLogin = () => {
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
-              <strong>Demo:</strong> Contraseña: admin123
+              <strong>Usuario:</strong> admin
+            </p>
+            <p className="text-sm text-muted-foreground text-center">
+              <strong>Contraseña:</strong> eldirecto2024
             </p>
           </div>
         </CardContent>

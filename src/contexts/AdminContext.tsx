@@ -7,13 +7,15 @@ import fleetHero3 from "@/assets/fleet-hero-3.jpg";
 interface AdminContextType {
   isAuthenticated: boolean;
   adminData: AdminData;
-  login: (password: string) => boolean;
+  login: (user: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateCarousel: (carousel: CarouselItem[]) => void;
   updateContact: (contact: ContactInfo) => void;
   updateSchedule: (schedule: Schedule) => void;
   updateAbout: (about: AboutContent) => void;
 }
+
+const API_URL = import.meta.env.VITE_LOCAL_API_URL;
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
@@ -70,9 +72,6 @@ Conectamos Rosario y Mar del Plata con un servicio integral que abarca desde el 
   }
 };
 
-// Contraseña simple para el demo (en producción debería ser más segura)
-const ADMIN_PASSWORD = 'admin123';
-
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
@@ -95,13 +94,30 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  const login = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem('transportadora_admin_auth', 'true');
-      return true;
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {   
+      const response = await fetch(`${API_URL}/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      })
+      
+      if (!response.ok) {
+        return false;
+      }
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('transportadora_admin_auth', data.token);
+        setIsAuthenticated(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error during login:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
