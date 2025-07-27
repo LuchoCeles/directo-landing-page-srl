@@ -1,40 +1,11 @@
-import { useState, useEffect } from 'react';
-import Login from '@/components/admin/Login';
-import AdminLayout from '@/components/admin/AdminLayout';
-import CarouselEditor from '@/components/admin/CarouselEditor';
-import ContactEditor from '@/components/admin/ContactEditor';
+import { useAdmin } from "@/contexts/AdminContext";
+import AdminLogin from "@/components/admin/AdminLogin";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 
 const Admin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeSection, setActiveSection] = useState<'carousel' | 'contact'>('carousel');
+  const { isAuthenticated } = useAdmin();
 
-  useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    setIsAuthenticated(!!token);
-  }, []);
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-  };
-
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
-  return (
-    <AdminLayout
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-      onLogout={handleLogout}
-    >
-      {activeSection === 'carousel' && <CarouselEditor />}
-      {activeSection === 'contact' && <ContactEditor />}
-    </AdminLayout>
-  );
+  return isAuthenticated ? <AdminDashboard /> : <AdminLogin />;
 };
 
 export default Admin;

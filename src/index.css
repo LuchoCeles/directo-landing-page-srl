@@ -8,61 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 215 25% 27%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 213 94% 68%;
-    --primary-foreground: 0 0% 100%;
-    --primary-dark: 213 94% 48%;
+    --primary: 210 90% 25%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 213 27% 84%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 210 15% 95%;
+    --secondary-foreground: 210 90% 25%;
 
-    --muted: 213 27% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 15% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 213 27% 84%;
-    --accent-foreground: 215 25% 27%;
+    --accent: 210 90% 25%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 213 27% 84%;
-    --input: 213 27% 84%;
-    --ring: 213 94% 68%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 90% 25%;
 
-    /* Transport specific colors */
-    --transport-blue: 213 94% 68%;
-    --transport-blue-dark: 213 94% 48%;
-    --transport-blue-light: 213 94% 88%;
-    --transport-blue-subtle: 213 94% 95%;
-    --transport-navy: 215 25% 27%;
-    --transport-gray: 215 16% 47%;
-    --transport-light: 0 0% 98%;
+    /* Corporate Transport Theme */
+    --transport-blue: 210 90% 25%;
+    --transport-blue-light: 210 90% 35%;
+    --transport-gray: 215 15% 25%;
+    --transport-gray-light: 215 15% 85%;
     
-    /* WhatsApp green */
-    --whatsapp: 142 70% 49%;
-    --whatsapp-dark: 142 70% 39%;
+    /* Gradient system */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--transport-blue)), hsl(var(--transport-blue-light)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--transport-blue-subtle)), hsl(var(--background)));
-    --gradient-section: linear-gradient(180deg, hsl(var(--background)), hsl(var(--transport-blue-subtle)));
+    /* Shadow system */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--transport-blue) / 0.2);
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1);
     
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -2px hsl(var(--transport-blue) / 0.1);
-    --shadow-card: 0 8px 32px -4px hsl(var(--transport-blue) / 0.15);
-    --shadow-button: 0 4px 16px -2px hsl(var(--primary) / 0.3);
-    
-    /* Transitions */
+    /* Animation system */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-fast: all 0.15s ease-out;
 
     --radius: 0.5rem;
 
@@ -129,63 +119,5 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@layer utilities {
-  /* Fade in animation */
-  .animate-fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Hover scale animation */
-  .hover-scale {
-    transition: transform 0.3s ease;
-  }
-
-  .hover-scale:hover {
-    transform: scale(1.05);
-  }
-
-  /* Smooth transitions */
-  .transition-smooth {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .transition-bounce {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary));
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary-dark));
   }
 }
