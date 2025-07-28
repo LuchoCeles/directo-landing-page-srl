@@ -22,7 +22,7 @@ const AdminLogin = () => {
 
     const success = login(user,password);
 
-    if (success) {
+    if (await success) {
       toast({
         title: "Acceso autorizado",
         description: "Bienvenido al panel administrativo",
@@ -31,7 +31,7 @@ const AdminLogin = () => {
       toast({
         title: "Acceso denegado",
         description: "Datos mal ingresados. Intente nuevamente.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
 
@@ -103,7 +103,7 @@ const AdminLogin = () => {
               <strong>Usuario:</strong> admin
             </p>
             <p className="text-sm text-muted-foreground text-center">
-              <strong>Contraseña:</strong> eldirecto2024
+              <strong>Contraseña:</strong> admin123
             </p>
           </div>
         </CardContent>
