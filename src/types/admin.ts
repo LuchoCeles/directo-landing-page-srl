@@ -14,18 +14,35 @@ export interface ContactInfo {
   rosarioAddress: string;
   marDelPlataAddress: string;
 }
-
+id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  sucursal: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  dia: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: [['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']]
+    }
+  },
+  hora_inicio: {
+    type: DataTypes.TIME,
+    allowNull: false
+  },
+  hora_fin: {
+    type: DataTypes.TIME,
+    allowNull: false
+  }
 export interface Schedule {
-  rosario: {
-    weekdays: string;
-    saturday: string;
-    sunday: string;
-  };
-  marDelPlata: {
-    weekdays: string;
-    saturday: string;
-    sunday: string;
-  };
+  sucursal:string;
+  dia:string;
+  hora_inicio:string;
+  hora_fin:string;
 }
 
 export interface AboutContent {

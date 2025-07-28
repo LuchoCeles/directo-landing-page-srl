@@ -20,46 +20,59 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 const defaultAdminData: AdminData = {
   carousel: [],
   contact: {
-    rosarioPhone: '+54 341 439‑7465',
-    marDelPlataPhone: '+54 223 477‑1190',
-    email: 'eldirecto@live.com.ar',
-    whatsapp: '+543414397465',
-    rosarioAddress: 'Dirección Rosario (editable desde panel admin)',
-    marDelPlataAddress: 'Dirección Mar del Plata (editable desde panel admin)'
+    rosarioPhone: "",
+    marDelPlataPhone: "",
+    email: "",
+    whatsapp: "",
+    rosarioAddress: "",
+    marDelPlataAddress: ""
   },
   schedule: {
-    rosario: {
-      weekdays: '07:00 – 15:30',
-      saturday: '07:00 – 11:30',
-      sunday: 'Cerrado'
-    },
-    marDelPlata: {
-      weekdays: '08:00 – 16:00',
-      saturday: '08:00 – 12:00',
-      sunday: 'Cerrado'
-    }
+    sucursal: "",
+    dia: "",
+    hora_inicio: "",
+    hora_fin: ""
   },
   about: {
-    content: `Desde 1960, en Transporte El Directo SRL ofrecemos soluciones logísticas seguras y eficientes, especializándonos en transporte de carga, encomiendas y servicios urbanos, interurbanos y de larga distancia.
-
-Nuestro compromiso es garantizar cada entrega con puntualidad, seriedad y el respaldo de un equipo capacitado que comprende las necesidades específicas de cada cliente.
-
-Conectamos Rosario y Mar del Plata con un servicio integral que abarca desde el transporte de mercaderías hasta la gestión logística completa, adaptándonos a los requerimientos particulares de cada empresa.`
+    content: ""
   }
 };
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
+  const [isLoading, setIsLoading] = useState(true);
 
 
-  // Cargar datos Pruebas
   useEffect(() => {
-    const fetchCarousel = async () => {
-      const cargar = await getSchedule();
-      console.log(cargar);
+    const loadInitialData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Cargar todos los datos en paralelo
+        const [carousel, contact, schedule, about] = await Promise.all([
+          getCarouselItem(),
+          getContact(),
+          getSchedule(),
+          getAbout()
+        ]);
+
+        setAdminData({
+          carousel,
+          contact,
+          schedule,
+          about
+        });
+
+      } catch (error) {
+        console.error("Error cargando datos iniciales:", error);
+        // Mantener los valores por defecto si hay error
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchCarousel();
+
+    loadInitialData();
   }, []);
 
 
@@ -81,7 +94,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-
+  // Funciones de autenticación
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       const response = await POST('/admin/login', { username, password });
@@ -106,6 +119,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.removeItem('transportadora_admin_auth');
   };
 
+  // Funciones para obtener y actualizar datos
   const getCarouselItem = async (): Promise<CarouselItem[]> => {
     try {
       const response = await GET('/api/carrusel');
@@ -234,7 +248,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (error) {
       console.error('Error actualizando el horario:', error);
     }
-  };  
+  };
 
   const updateAboutContent = async (about: AboutContent): Promise<void> => {
     try {
@@ -250,6 +264,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
 
+  // Función para guardar los datos del administrador en el estado y localStorage
   const saveAdminData = (newData: AdminData) => {
     setAdminData(newData);
     localStorage.setItem('transportadora_admin_data', JSON.stringify(newData));
@@ -275,6 +290,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveAdminData(newData);
   };
 
+  // Cargar datos iniciales
   return (
     <AdminContext.Provider value={{
       isAuthenticated,
