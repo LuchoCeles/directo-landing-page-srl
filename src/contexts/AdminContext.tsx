@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
 import { GET, POST, PATCH, DELETE } from '@/services/fetch';
-import { get } from 'http';
 
 interface AdminContextType {
   isAuthenticated: boolean;
@@ -20,18 +19,15 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 const defaultAdminData: AdminData = {
   carousel: [],
   contact: {
-    rosarioPhone: "",
-    marDelPlataPhone: "",
-    email: "",
-    whatsapp: "",
-    rosarioAddress: "",
-    marDelPlataAddress: ""
+  telefono: "",
+  email: "",
+  whatsapp: "",
+  Address: "",
   },
   schedule: {
     sucursal: "",
     dia: "",
-    hora_inicio: "",
-    hora_fin: ""
+    horario: ""
   },
   about: {
     content: ""
@@ -45,35 +41,38 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Cargar todos los datos en paralelo
-        const [carousel, contact, schedule, about] = await Promise.all([
-          getCarouselItem(),
-          getContact(),
-          getSchedule(),
-          getAbout()
-        ]);
+    if (isAuthenticated) {
+      const loadInitialData = async () => {
+        try {
+          setIsLoading(true);
 
-        setAdminData({
-          carousel,
-          contact,
-          schedule,
-          about
-        });
+          // Cargar todos los datos en paralelo
+          const [carousel, contact, schedule, about] = await Promise.all([
+            getCarouselItem(),
+            getContact(),
+            getSchedule(),
+            getAbout()
+          ]);
 
-      } catch (error) {
-        console.error("Error cargando datos iniciales:", error);
-        // Mantener los valores por defecto si hay error
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          setAdminData({
+            carousel,
+            contact,
+            schedule,
+            about
+          });
 
-    loadInitialData();
-  }, []);
+        } catch (error) {
+          console.error("Error cargando datos iniciales:", error);
+          // Mantener los valores por defecto si hay error
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      loadInitialData();
+      console.log('AdminProvider initialized', adminData);
+    }
+  }, [isAuthenticated]);
 
 
   useEffect(() => {
