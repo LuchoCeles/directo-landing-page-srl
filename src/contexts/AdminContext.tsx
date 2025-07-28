@@ -52,13 +52,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
 
+
+  // Cargar datos Pruebas
   useEffect(() => {
     const fetchCarousel = async () => {
-      const cargar = await getAbout();
+      const cargar = await getSchedule();
       console.log(cargar);
     };
     fetchCarousel();
   }, []);
+
+
   useEffect(() => {
     // Verificar si está autenticado en localStorage
     const authStatus = localStorage.getItem('transportadora_admin_auth');
@@ -131,6 +135,119 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return defaultAdminData.about;
     }
   }
+
+  const getSchedule = async (): Promise<Schedule> => {
+    try {
+      const response = await GET('/api/horarios');
+      if (!response.ok) {
+        console.error('Error al cargar el horario:', response.statusText);
+        return defaultAdminData.schedule;
+      }
+      const data = await response.json();
+      return data as Schedule;
+    } catch (error) {
+      console.error('Error cargando el horario:', error);
+      return defaultAdminData.schedule;
+    }
+  };
+
+  const getContact = async (): Promise<ContactInfo> => {
+    try {
+      const response = await GET('/api/contacto');
+      if (!response.ok) {
+        console.error('Error al cargar el contacto:', response.statusText);
+        return defaultAdminData.contact;
+      }
+      const data = await response.json();
+      return data as ContactInfo;
+    } catch (error) {
+      console.error('Error cargando el contacto:', error);
+      return defaultAdminData.contact;
+    }
+  };
+
+  const deleteCarouselItem = async (id: string): Promise<void> => {
+    try {
+      const response = await DELETE('/admin/carrusel/', id);
+      if (!response.ok) {
+        console.error('Error al eliminar el item del carrusel:', response.statusText);
+      } else {
+        const updatedCarousel = adminData.carousel.filter(item => item.id !== id);
+        updateCarousel(updatedCarousel);
+      }
+    } catch (error) {
+      console.error('Error eliminando el item del carrusel:', error);
+    }
+  };
+
+  const addCarouselItem = async (item: CarouselItem): Promise<void> => {
+    try {
+      const response = await POST('/admin/carrusel', item);
+      if (!response.ok) {
+        console.error('Error al agregar el item al carrusel:', response.statusText);
+      } else {
+        const newItem = await response.json();
+        updateCarousel([...adminData.carousel, newItem]);
+      }
+    } catch (error) {
+      console.error('Error agregando el item al carrusel:', error);
+    }
+  };
+
+  const updateCarouselItem = async (item: CarouselItem): Promise<void> => {
+    try {
+      const response = await PATCH('/admin/carrusel', item);
+      if (!response.ok) {
+        console.error('Error al actualizar el item del carrusel:', response.statusText);
+      } else {
+        const updatedCarousel = adminData.carousel.map(carouselItem =>
+          carouselItem.id === item.id ? item : carouselItem
+        );
+        updateCarousel(updatedCarousel);
+      }
+    } catch (error) {
+      console.error('Error actualizando el item del carrusel:', error);
+    }
+  };
+
+  const updateContactInfo = async (contact: ContactInfo): Promise<void> => {
+    try {
+      const response = await PATCH('/admin/contacto', contact);
+      if (!response.ok) {
+        console.error('Error al actualizar el contacto:', response.statusText);
+      } else {
+        updateContact(contact);
+      }
+    } catch (error) {
+      console.error('Error actualizando el contacto:', error);
+    }
+  };
+
+  const updateScheduleInfo = async (schedule: Schedule): Promise<void> => {
+    try {
+      const response = await PATCH('/admin/horarios', schedule);
+      if (!response.ok) {
+        console.error('Error al actualizar el horario:', response.statusText);
+      } else {
+        updateSchedule(schedule);
+      }
+    } catch (error) {
+      console.error('Error actualizando el horario:', error);
+    }
+  };  
+
+  const updateAboutContent = async (about: AboutContent): Promise<void> => {
+    try {
+      const response = await PATCH('/admin/about', about);
+      if (!response.ok) {
+        console.error('Error al actualizar el contenido "Sobre nosotros":', response.statusText);
+      } else {
+        updateAbout(about);
+      }
+    } catch (error) {
+      console.error('Error actualizando el contenido "Sobre nosotros":', error);
+    }
+  };
 
 
   const saveAdminData = (newData: AdminData) => {
