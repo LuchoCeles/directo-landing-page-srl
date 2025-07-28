@@ -22,7 +22,7 @@ const AdminLogin = () => {
 
     const success = login(user,password);
 
-    if (!success) {
+    if (success) {
       toast({
         title: "Acceso autorizado",
         description: "Bienvenido al panel administrativo",

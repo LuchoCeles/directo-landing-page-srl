@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
-import truckHero1 from "@/assets/truck-hero-1.jpg";
-import logisticsHero2 from "@/assets/logistics-hero-2.jpg";
-import fleetHero3 from "@/assets/fleet-hero-3.jpg";
+import { GET, POST, PATCH, DELETE } from '@/services/fetch';
 import { get } from 'http';
-import { log } from 'console';
 
 interface AdminContextType {
   isAuthenticated: boolean;
@@ -17,9 +14,8 @@ interface AdminContextType {
   updateAbout: (about: AboutContent) => void;
 }
 
-const API_URL = import.meta.env.VITE_LOCAL_API_URL;
-
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
+
 
 const defaultAdminData: AdminData = {
   carousel: [],
@@ -57,6 +53,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
 
   useEffect(() => {
+    const fetchCarousel = async () => {
+      const cargar = await getAbout();
+      console.log(cargar);
+    };
+    fetchCarousel();
+  }, []);
+  useEffect(() => {
     // Verificar si está autenticado en localStorage
     const authStatus = localStorage.getItem('transportadora_admin_auth');
     if (authStatus === 'true') {
@@ -77,15 +80,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-
-      const response = await fetch(`${API_URL}/admin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      })
-
+      const response = await POST('/admin/login', { username, password });
       if (!response.ok) {
         return false;
       }
@@ -109,14 +104,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const getCarouselItem = async (): Promise<CarouselItem[]> => {
     try {
-      const response = await fetch(`${API_URL}/admin/carrusel`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await GET('/api/carrusel');
       if (!response.ok) {
         console.error('Error al cargar el carousel:', response.statusText);
         return [];
@@ -129,7 +117,20 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }
 
-
+  const getAbout = async (): Promise<AboutContent> => {
+    try {
+      const response = await GET('/api/about');
+      if (!response.ok) {
+        console.error('Error al cargar el horario:', response.statusText);
+        return defaultAdminData.about;
+      }
+      const data = await response.json();
+      return data as AboutContent;
+    } catch (error) {
+      console.error('Error cargando el horario:', error);
+      return defaultAdminData.about;
+    }
+  }
 
 
   const saveAdminData = (newData: AdminData) => {
