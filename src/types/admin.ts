@@ -1,9 +1,10 @@
 export interface CarouselItem {
   id: string;
-  imageUrl: string;
+  image: string;
   title: string;
   description: string;
   order: number;
+  imageFile: File;
 }
 
 export interface ContactInfo {

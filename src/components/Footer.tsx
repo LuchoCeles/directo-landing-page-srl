@@ -52,8 +52,8 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Contacto</h4>
             <div className="space-y-2 text-white/80 text-sm">
-              <p>📍 <strong>Rosario:</strong> {adminData.contact.rosarioPhone}</p>
-              <p>📍 <strong>Mar del Plata:</strong> {adminData.contact.marDelPlataPhone}</p>
+              <p>📍 <strong>Rosario:</strong> {adminData.contact.telefono}</p>
+              <p>📍 <strong>Mar del Plata:</strong> {adminData.contact.telefono}</p>
               <p>✉️ {adminData.contact.email}</p>
             </div>
           </div>

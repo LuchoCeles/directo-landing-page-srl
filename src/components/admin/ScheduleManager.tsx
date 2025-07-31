@@ -63,7 +63,7 @@ const ScheduleManager = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-primary" />
-              <span>📍 Rosario</span>
+              <span>📍 {editSchedule.sucursal}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -72,7 +72,7 @@ const ScheduleManager = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Lunes a Viernes</label>
                   <Input
-                    value={editSchedule.rosario.weekdays}
+                    value={editSchedule.horario}
                     onChange={(e) => updateLocationSchedule('rosario', 'weekdays', e.target.value)}
                     placeholder="07:30 – 15:30"
                   />
@@ -80,7 +80,7 @@ const ScheduleManager = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Sábados</label>
                   <Input
-                    value={editSchedule.rosario.saturday}
+                    value={editSchedule.horario}
                     onChange={(e) => updateLocationSchedule('rosario', 'saturday', e.target.value)}
                     placeholder="08:00 – 11:30"
                   />
@@ -88,7 +88,7 @@ const ScheduleManager = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Domingos</label>
                   <Input
-                    value={editSchedule.rosario.sunday}
+                    value={editSchedule.horario}
                     onChange={(e) => updateLocationSchedule('rosario', 'sunday', e.target.value)}
                     placeholder="Cerrado"
                   />
@@ -106,65 +106,8 @@ const ScheduleManager = () => {
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="font-medium">Domingos</span>
-                  <span className={adminData.schedule.rosario.sunday === 'Cerrado' ? 'text-destructive font-semibold' : 'text-primary font-semibold'}>
-                    {adminData.schedule.rosario.sunday}
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Mar del Plata */}
-        <Card className="shadow-card-custom">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-primary" />
-              <span>📍 Mar del Plata</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Lunes a Viernes</label>
-                  <Input
-                    value={editSchedule.marDelPlata.weekdays}
-                    onChange={(e) => updateLocationSchedule('marDelPlata', 'weekdays', e.target.value)}
-                    placeholder="08:00 – 16:00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Sábados</label>
-                  <Input
-                    value={editSchedule.marDelPlata.saturday}
-                    onChange={(e) => updateLocationSchedule('marDelPlata', 'saturday', e.target.value)}
-                    placeholder="08:00 – 12:00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Domingos</label>
-                  <Input
-                    value={editSchedule.marDelPlata.sunday}
-                    onChange={(e) => updateLocationSchedule('marDelPlata', 'sunday', e.target.value)}
-                    placeholder="Cerrado"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="font-medium">Lunes a Viernes</span>
-                  <span className="text-primary font-semibold">{adminData.schedule.marDelPlata.weekdays}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="font-medium">Sábados</span>
-                  <span className="text-primary font-semibold">{adminData.schedule.marDelPlata.saturday}</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="font-medium">Domingos</span>
-                  <span className={adminData.schedule.marDelPlata.sunday === 'Cerrado' ? 'text-destructive font-semibold' : 'text-primary font-semibold'}>
-                    {adminData.schedule.marDelPlata.sunday}
+                  <span className={adminData.schedule.horario === 'Cerrado' ? 'text-destructive font-semibold' : 'text-primary font-semibold'}>
+                    {adminData.schedule.horario}
                   </span>
                 </div>
               </div>

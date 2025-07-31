@@ -1,17 +1,21 @@
 const backendurl = import.meta.env.VITE_LOCAL_API_URL;
 
-export async function POST(url, data) {
-  return await fetch(backendurl + url, {
+export async function POST(url, data, isFormData = false) {
+  const config = {
     method: 'POST',
     mode: 'cors',
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
     },
-    body: JSON.stringify(data)
-  });
-};
+    body: isFormData ? data : JSON.stringify(data)
+  };
 
+  if (!isFormData) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return await fetch(backendurl + url, config);
+}
 export async function GET(url, data) {
   const queryString = data ? `?${new URLSearchParams(data).toString()}` : "";
 

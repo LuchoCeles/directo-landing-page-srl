@@ -19,10 +19,10 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 const defaultAdminData: AdminData = {
   carousel: [],
   contact: {
-  telefono: "",
-  email: "",
-  whatsapp: "",
-  Address: "",
+    telefono: "",
+    email: "",
+    whatsapp: "",
+    Address: "",
   },
   schedule: {
     sucursal: "",
