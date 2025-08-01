@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
 import { GET, POST, PATCH, DELETE } from '@/services/fetch';
+import { Car } from 'lucide-react';
 
 interface AdminContextType {
   isAuthenticated: boolean;
@@ -121,15 +122,29 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Funciones para obtener y actualizar datos
   const getCarouselItem = async (): Promise<CarouselItem[]> => {
     try {
-      const response = await GET('/api/carrusel');
+      const response = await POST('/api/carrusel');
       if (!response.ok) {
-        console.error('Error al cargar el carousel:', response.statusText);
+        console.error('Error al cargar el carrusel:', response.status, response.statusText);
         return [];
       }
-      const data = await response.json();
-      return data as CarouselItem[];
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as CarouselItem[];
+      }
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as CarouselItem[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
     } catch (error) {
-      console.error('Error cargando el carousel:', error);
+      console.error('Error cargando el carrusel:', error);
       return [];
     }
   }

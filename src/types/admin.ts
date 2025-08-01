@@ -1,6 +1,6 @@
 export interface CarouselItem {
   id: string;
-  image: string;
+  image?: string;
   title: string;
   description: string;
   order: number;

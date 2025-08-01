@@ -38,7 +38,6 @@ const CarouselManager = () => {
       return;
     }
 
-    // Validar tamaño (5MB máximo)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Error",
@@ -54,14 +53,14 @@ const CarouselManager = () => {
     if (isEditing && editingItem) {
       setEditingItem({
         ...editingItem,
-        imageFile: file,  // Guardamos el archivo para enviarlo
-        image: previewUrl  // Usamos la URL para vista previa
+        imageFile: file,
+        image: previewUrl
       });
     } else {
       setNewItem({
         ...newItem,
-        imageFile: file,  // Guardamos el archivo para enviarlo
-        image: previewUrl  // Usamos la URL para vista previa
+        imageFile: file,
+        image: previewUrl
       });
     }
   };
@@ -82,7 +81,6 @@ const CarouselManager = () => {
     formData.append('description', newItem.description);
 
     try {
-      console.log('Enviando datos al servidor:', formData);
       const response = await POST('/admin/carrusel', formData, true);
 
       if (response.ok) {
@@ -123,7 +121,7 @@ const CarouselManager = () => {
 
       if (response.ok) {
         const updatedItem = await response.json();
-        const updatedCarousel = adminData.carousel.map(item => 
+        const updatedCarousel = adminData.carousel.map(item =>
           item.id === updatedItem.id ? updatedItem : item
         );
         updateCarousel(updatedCarousel);
@@ -169,7 +167,7 @@ const CarouselManager = () => {
     }
   };
 
-  const moveItem = (id: string, direction: 'up' | 'down') => {
+  const moveItem = async (id: string, direction: 'up' | 'down') => {
     const currentIndex = adminData.carousel.findIndex(item => item.id === id);
     if (
       (direction === 'up' && currentIndex === 0) ||
@@ -190,6 +188,22 @@ const CarouselManager = () => {
     });
 
     updateCarousel(newCarousel);
+    const itemsOrder = adminData.carousel.map(item => ({
+      id: item.id,
+      order: item.order
+    }));
+
+    console.log("items order", itemsOrder)
+    const response = await PATCH('/admin/carrusel', itemsOrder);
+    if (!response.ok) {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el orden del carrusel",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Orden actualizado",
       description: "El orden del carrusel ha sido modificado",
@@ -302,7 +316,6 @@ const CarouselManager = () => {
               <div className="grid md:grid-cols-3 gap-6">
                 {/* Image Preview */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Imagen</label>
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
                     {imageErrors[item.id] || !item.image ? (
                       <div className="flex flex-col items-center justify-center text-muted-foreground p-4">
