@@ -20,7 +20,7 @@ const AdminLogin = () => {
     // Simular delay de autenticación
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const success = login(user,password);
+    const success = login(user, password);
 
     if (await success) {
       toast({
@@ -91,7 +91,7 @@ const AdminLogin = () => {
 
             <Button
               type="submit"
-              className="w-full shadow-elegant hover:text-white hover:bg-color-blue"
+              className="w-full shadow-elegant"
               disabled={isLoading}
             >
               {isLoading ? "Verificando..." : "Iniciar Sesión"}
