@@ -28,6 +28,6 @@ export interface AboutContent {
 export interface AdminData {
   carousel: CarouselItem[];
   contact: ContactInfo;
-  schedule: Schedule;
+  schedule: Schedule[];
   about: AboutContent;
 }

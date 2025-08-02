@@ -9,7 +9,7 @@ interface AdminContextType {
   logout: () => void;
   updateCarousel: (carousel: CarouselItem[]) => void;
   updateContact: (contact: ContactInfo) => void;
-  updateSchedule: (schedule: Schedule) => void;
+  updateSchedule: (schedule: Schedule[]) => void;
   updateAbout: (about: AboutContent) => void;
 }
 
@@ -24,13 +24,9 @@ const defaultAdminData: AdminData = {
     whatsapp: "",
     Address: "",
   },
-  schedule: {
-    sucursal: "",
-    dia: "",
-    horario: ""
-  },
+  schedule: [],
   about: {
-    id:"",
+    id: "",
     content: ""
   }
 };
@@ -164,18 +160,34 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }
 
-  const getSchedule = async (): Promise<Schedule> => {
+  const getSchedule = async (): Promise<Schedule[]> => {
     try {
       const response = await GET('/api/horarios');
       if (!response.ok) {
-        console.error('Error al cargar el horario:', response.statusText);
-        return defaultAdminData.schedule;
+        console.error('Error al cargar el horario:', response.status, response.statusText);
+        return [];
       }
-      const data = await response.json();
-      return data as Schedule;
+
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as Schedule[];
+      }
+
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as Schedule[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
     } catch (error) {
       console.error('Error cargando el horario:', error);
-      return defaultAdminData.schedule;
+      return [];
     }
   };
 
@@ -194,45 +206,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  
-  const updateContactInfo = async (contact: ContactInfo): Promise<void> => {
-    try {
-      const response = await PATCH('/admin/contacto', contact);
-      if (!response.ok) {
-        console.error('Error al actualizar el contacto:', response.statusText);
-      } else {
-        updateContact(contact);
-      }
-    } catch (error) {
-      console.error('Error actualizando el contacto:', error);
-    }
-  };
 
-  const updateScheduleInfo = async (schedule: Schedule): Promise<void> => {
-    try {
-      const response = await PATCH('/admin/horarios', schedule);
-      if (!response.ok) {
-        console.error('Error al actualizar el horario:', response.statusText);
-      } else {
-        updateSchedule(schedule);
-      }
-    } catch (error) {
-      console.error('Error actualizando el horario:', error);
-    }
-  };
 
-  const updateAboutContent = async (about: AboutContent): Promise<void> => {
-    try {
-      const response = await PATCH('/admin/about', about);
-      if (!response.ok) {
-        console.error('Error al actualizar el contenido "Sobre nosotros":', response.statusText);
-      } else {
-        updateAbout(about);
-      }
-    } catch (error) {
-      console.error('Error actualizando el contenido "Sobre nosotros":', error);
-    }
-  };
 
 
   // Función para guardar los datos del administrador en el estado y localStorage
@@ -251,7 +226,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveAdminData(newData);
   };
 
-  const updateSchedule = (schedule: Schedule) => {
+  const updateSchedule = (schedule: Schedule[]) => {
     const newData = { ...adminData, schedule };
     saveAdminData(newData);
   };
