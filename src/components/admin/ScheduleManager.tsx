@@ -98,11 +98,11 @@ const ScheduleManager = () => {
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="font-medium">Lunes a Viernes</span>
-                  <span className="text-primary font-semibold">{adminData.schedule.rosario.weekdays}</span>
+                  <span className="text-primary font-semibold">{adminData.schedule.horario}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="font-medium">Sábados</span>
-                  <span className="text-primary font-semibold">{adminData.schedule.rosario.saturday}</span>
+                  <span className="text-primary font-semibold">{adminData.schedule.horario}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="font-medium">Domingos</span>

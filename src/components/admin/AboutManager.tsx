@@ -55,7 +55,7 @@ const AboutManager = () => {
           <Button
             onClick={() => setIsEditing(!isEditing)}
             variant={isEditing ? "outline" : "default"}
-            className="flex items-center space-x-2 hover:bg-blue"
+            className="flex items-center space-x-2"
           >
             <Edit className="w-4 h-4" />
             <span>Editar Contenido</span>
@@ -88,7 +88,7 @@ const AboutManager = () => {
               </div>
 
               <div className="flex space-x-2">
-                <Button onClick={handleSave} className="flex items-center space-x-2  hover:bg-blue">
+                <Button onClick={handleSave} className="flex items-center space-x-2">
                   <Save className="w-4 h-4" />
                   <span>Guardar Cambios</span>
                 </Button>
