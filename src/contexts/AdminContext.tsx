@@ -30,6 +30,7 @@ const defaultAdminData: AdminData = {
     horario: ""
   },
   about: {
+    id:"",
     content: ""
   }
 };
@@ -193,50 +194,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const deleteCarouselItem = async (id: string): Promise<void> => {
-    try {
-      const response = await DELETE('/admin/carrusel/', id);
-      if (!response.ok) {
-        console.error('Error al eliminar el item del carrusel:', response.statusText);
-      } else {
-        const updatedCarousel = adminData.carousel.filter(item => item.id !== id);
-        updateCarousel(updatedCarousel);
-      }
-    } catch (error) {
-      console.error('Error eliminando el item del carrusel:', error);
-    }
-  };
-
-  const addCarouselItem = async (item: CarouselItem): Promise<void> => {
-    try {
-      const response = await POST('/admin/carrusel', item);
-      if (!response.ok) {
-        console.error('Error al agregar el item al carrusel:', response.statusText);
-      } else {
-        const newItem = await response.json();
-        updateCarousel([...adminData.carousel, newItem]);
-      }
-    } catch (error) {
-      console.error('Error agregando el item al carrusel:', error);
-    }
-  };
-
-  const updateCarouselItem = async (item: CarouselItem): Promise<void> => {
-    try {
-      const response = await PATCH('/admin/carrusel', item);
-      if (!response.ok) {
-        console.error('Error al actualizar el item del carrusel:', response.statusText);
-      } else {
-        const updatedCarousel = adminData.carousel.map(carouselItem =>
-          carouselItem.id === item.id ? item : carouselItem
-        );
-        updateCarousel(updatedCarousel);
-      }
-    } catch (error) {
-      console.error('Error actualizando el item del carrusel:', error);
-    }
-  };
-
+  
   const updateContactInfo = async (contact: ContactInfo): Promise<void> => {
     try {
       const response = await PATCH('/admin/contacto', contact);

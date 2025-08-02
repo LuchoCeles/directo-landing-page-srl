@@ -21,6 +21,7 @@ export interface Schedule {
 }
 
 export interface AboutContent {
+  id: string;
   content: string;
 }
 
