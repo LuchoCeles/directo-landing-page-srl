@@ -29,16 +29,21 @@ export async function GET(url, data) {
 };
 
 
-export async function PATCH(url, data) {
-  return await fetch(backendurl + url, {
+export async function PATCH(url, data, isFormData = false) {
+  const config = {
     method: 'PATCH',
     mode: 'cors',
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
     },
-    body: JSON.stringify(data)
-  });
+    body: isFormData ? data : JSON.stringify(data)
+  };
+  
+  if (!isFormData) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return await fetch(backendurl + url, config);
 }
 
 export async function DELETE(url, data) {

@@ -110,14 +110,14 @@ const CarouselManager = () => {
 
     const formData = new FormData();
     if (editingItem.imageFile) {
-      formData.append('image', editingItem.imageFile);
+      formData.append('imageFile', editingItem.imageFile);
     }
+    formData.append('id', editingItem.id);
     formData.append('title', editingItem.title);
     formData.append('description', editingItem.description || '');
-    formData.append('order', editingItem.order.toString());
 
     try {
-      const response = await PATCH(`/admin/carrusel/${editingItem.id}`, formData);
+      const response = await PATCH('/admin/carrusel/update', formData, true);
 
       if (response.ok) {
         const updatedItem = await response.json();
@@ -193,7 +193,6 @@ const CarouselManager = () => {
       order: item.order
     }));
 
-    console.log("items order", itemsOrder)
     const response = await PATCH('/admin/carrusel', itemsOrder);
     if (!response.ok) {
       toast({

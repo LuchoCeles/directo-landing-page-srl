@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
 import { GET, POST, PATCH, DELETE } from '@/services/fetch';
-import { Car } from 'lucide-react';
 
 interface AdminContextType {
   isAuthenticated: boolean;
