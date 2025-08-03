@@ -5,7 +5,7 @@ export async function POST(url, data, isFormData = false) {
     method: 'POST',
     mode: 'cors',
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_token')}`
     },
     body: isFormData ? data : JSON.stringify(data)
   };
@@ -23,7 +23,7 @@ export async function GET(url, data) {
     method: 'GET',
     mode: 'cors',
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_token')}`
     }
   });
 };
@@ -34,7 +34,7 @@ export async function PATCH(url, data, isFormData = false) {
     method: 'PATCH',
     mode: 'cors',
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_token')}`
     },
     body: isFormData ? data : JSON.stringify(data)
   };
@@ -53,7 +53,7 @@ export async function DELETE(url, data) {
     method: 'DELETE',
     mode: 'cors',
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_token')}`
     },
   });
 }
