@@ -74,8 +74,8 @@ const AdminDashboard = () => {
             <CardContent className="p-6 text-center">
               <Phone className="w-8 h-8 text-primary mx-auto mb-2" />
               <h3 className="font-semibold text-foreground">Contacto</h3>
-              <p className="text-2xl font-bold text-primary">✓</p>
-              <p className="text-sm text-muted-foreground">configurado</p>
+              <p className="text-2xl font-bold text-primary">{adminData.contact.length > 0 ? '✓' : 'X'}</p>
+              <p className="text-sm text-muted-foreground">{adminData.contact.length > 0 ? 'configurado' : 'configurar'}</p>
             </CardContent>
           </Card>
         </div>
