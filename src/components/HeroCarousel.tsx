@@ -2,33 +2,57 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdmin } from "@/contexts/AdminContext";
+import { CarouselItem } from "@/types/admin";
 
 const HeroCarousel = () => {
   const { adminData } = useAdmin();
-  const carouselData = adminData.carousel.sort((a, b) => a.order - b.order);
+  const [carouselData, setCarouselData] = useState<CarouselItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Actualizar el estado cuando adminData.carousel cambie
   useEffect(() => {
+    if (adminData.carousel && adminData.carousel.length > 0) {
+      setCarouselData(adminData.carousel);
+    }
+  }, [adminData.carousel]);
+
+  useEffect(() => {
+    if (carouselData.length === 0) return;
+    
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
+      setCurrentIndex((prevIndex) =>
         prevIndex === carouselData.length - 1 ? 0 : prevIndex + 1
       );
     }, 6000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [carouselData.length]);
 
   const goToPrevious = () => {
+    if (carouselData.length === 0) return;
     setCurrentIndex(currentIndex === 0 ? carouselData.length - 1 : currentIndex - 1);
   };
 
   const goToNext = () => {
+    if (carouselData.length === 0) return;
     setCurrentIndex(currentIndex === carouselData.length - 1 ? 0 : currentIndex + 1);
   };
 
   const goToSlide = (index: number) => {
+    if (carouselData.length === 0) return;
     setCurrentIndex(index);
   };
+
+  // Mostrar un loader si no hay datos
+  if (carouselData.length === 0) {
+    return (
+      <section id="inicio" className="relative h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p>Cargando carrusel...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="inicio" className="relative h-screen overflow-hidden">
@@ -37,9 +61,8 @@ const HeroCarousel = () => {
         {carouselData.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? "opacity-100" : "opacity-0"
+              }`}
           >
             <img
               src={slide.image}
@@ -56,10 +79,10 @@ const HeroCarousel = () => {
         <div className="container mx-auto px-4 text-center text-white">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              {carouselData[currentIndex].title}
+              {carouselData[currentIndex]?.title || ""}
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-white/90">
-              {carouselData[currentIndex].description}
+              {carouselData[currentIndex]?.description || ""}
             </p>
             <Button
               size="lg"
@@ -96,11 +119,10 @@ const HeroCarousel = () => {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? "bg-white scale-125" 
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                ? "bg-white scale-125"
                 : "bg-white/50 hover:bg-white/75"
-            }`}
+              }`}
           />
         ))}
       </div>
