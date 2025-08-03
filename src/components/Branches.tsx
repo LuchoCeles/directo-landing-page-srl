@@ -42,10 +42,6 @@ const Branches = () => {
                 <p className="text-muted-foreground">
                   {branch.address}
                 </p>
-                <div className="flex items-center justify-center space-x-2 text-primary">
-                  <Phone className="w-4 h-4" />
-                  <span className="font-semibold">{branch.phone}</span>
-                </div>
               </CardContent>
             </Card>
           ))}

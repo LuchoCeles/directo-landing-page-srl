@@ -7,36 +7,13 @@ import { useAdmin } from "@/contexts/AdminContext";
 
 const Contact = () => {
   const { adminData } = useAdmin();
-  
+
   // Safety check: ensure contact is an array
   const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
-  
-  const contactInfo = [
-    ...contactArray.map(contact => ({
-      icon: Phone,
-      title: contact.sucursal || "Sucursal",
-      content: contact.telefono,
-      action: `tel:${contact.telefono.replace(/\s/g, '')}`
-    })),
-    ...(contactArray.length > 0 ? [{
-      icon: Mail,
-      title: "Email",
-      content: contactArray[0]?.email || "",
-      action: `mailto:${contactArray[0]?.email || ""}`
-    }] : []),
-    ...(contactArray.length > 0 && contactArray[0]?.whatsapp ? [{
-      icon: MessageCircle,
-      title: "WhatsApp",
-      content: "Contacto directo",
-      action: `https://wa.me/${contactArray[0]?.whatsapp?.replace(/\+/g, '') || ""}`
-    }] : [])
-  ];
 
-  const handleWhatsAppClick = () => {
-    if (contactArray.length > 0 && contactArray[0]?.whatsapp) {
-      const whatsappNumber = contactArray[0].whatsapp.replace(/\+/g, '');
-      window.open(`https://wa.me/${whatsappNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
-    }
+  const handleWhatsAppClick = (whatsappNumber: string) => {
+    const cleanedNumber = whatsappNumber.replace(/\+/g, '');
+    window.open(`https://wa.me/${cleanedNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
   };
 
   return (
@@ -58,58 +35,71 @@ const Contact = () => {
             <h3 className="text-2xl font-bold text-foreground mb-6">
               Información de Contacto
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {contactInfo.map((item, index) => (
-                <Card key={index} className="shadow-card-custom hover:shadow-elegant transition-all duration-300 cursor-pointer">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                      <item.icon className="w-6 h-6 text-primary-foreground" />
+
+            <div className="flex items-start gap-4">
+              {contactArray.map((sucursal, index) => (
+                <Card key={index} className="shadow-card-custom hover:shadow-elegant transition-all duration-300">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-foreground">
+                     📍 {sucursal.sucursal || "Sucursal"}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <MapPin className="w-5 h-5 mt-1 text-primary" />
+                      <div>
+                        <h4 className="font-medium text-foreground">Dirección</h4>
+                        <p className="text-muted-foreground text-sm">
+                          {sucursal.address || "No especificada"}
+                        </p>
+                      </div>
                     </div>
-                    <h4 className="font-semibold text-foreground mb-2">
-                      {item.title}
-                    </h4>
-                    <p className="text-muted-foreground text-sm">
-                      {item.content}
-                    </p>
+
+                    {sucursal.telefono && (
+                      <div className="flex items-start gap-4">
+                        <Phone className="w-5 h-5 mt-1 text-primary" />
+                        <div>
+                          <h4 className="font-medium text-foreground">Teléfono</h4>
+                          <span className="text-muted-foreground text-sm">
+                            {sucursal.telefono}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {sucursal.email && (
+                      <div className="flex items-start gap-4">
+                        <Mail className="w-5 h-5 mt-1 text-primary" />
+                        <div>
+                          <h4 className="font-medium text-foreground">Email</h4>
+                          <a
+                            href={`mailto:${sucursal.email}`}
+                            className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                          >
+                            {sucursal.email}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {sucursal.whatsapp && (
+                      <div className="flex items-start gap-4">
+                        <MessageCircle className="w-5 h-5 mt-1 text-primary" />
+                        <div>
+                          <h4 className="font-medium text-foreground">WhatsApp</h4>
+                          <button
+                            onClick={() => handleWhatsAppClick(sucursal.whatsapp)}
+                            className="text-muted-foreground text-sm hover:text-primary transition-colors text-left"
+                          >
+                            {sucursal.whatsapp}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
             </div>
-
-            {/* WhatsApp CTA */}
-            {contactArray.length > 0 && contactArray[0]?.whatsapp && (
-              <div className="mt-8">
-                <Button
-                  onClick={handleWhatsAppClick}
-                  size="lg"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-elegant"
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Contactar por WhatsApp
-                </Button>
-              </div>
-            )}
-
-            {/* Address Section */}
-            <Card className="mt-6 shadow-card-custom">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MapPin className="w-5 h-5 text-primary" />
-                  <span>Nuestras Direcciones</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {contactArray.map((contact, index) => (
-                  <div key={contact.id || index}>
-                    <h4 className="font-semibold text-foreground">📍 {contact.sucursal}</h4>
-                    <p className="text-muted-foreground text-sm">
-                      {contact.address}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
           </div>
 
           {/* Contact Form */}
@@ -126,7 +116,7 @@ const Contact = () => {
                     <label className="text-sm font-medium text-foreground">
                       Nombre *
                     </label>
-                    <Input 
+                    <Input
                       placeholder="Su nombre completo"
                       className="border-border focus:ring-primary"
                     />
@@ -135,53 +125,53 @@ const Contact = () => {
                     <label className="text-sm font-medium text-foreground">
                       Empresa
                     </label>
-                    <Input 
+                    <Input
                       placeholder="Nombre de la empresa"
                       className="border-border focus:ring-primary"
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
                     Email *
                   </label>
-                  <Input 
+                  <Input
                     type="email"
                     placeholder="correo@empresa.com"
                     className="border-border focus:ring-primary"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
                     Teléfono
                   </label>
-                  <Input 
+                  <Input
                     type="tel"
                     placeholder="+54 XXX XXX-XXXX"
                     className="border-border focus:ring-primary"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
                     Mensaje *
                   </label>
-                  <Textarea 
+                  <Textarea
                     placeholder="Describa su consulta o requerimiento..."
                     rows={5}
                     className="border-border focus:ring-primary resize-none"
                   />
                 </div>
-                
-                <Button 
-                  size="lg" 
+
+                <Button
+                  size="lg"
                   className="w-full bg-primary hover:bg-primary/90 shadow-elegant"
                 >
                   Enviar Mensaje
                 </Button>
-                
+
                 <p className="text-xs text-muted-foreground">
                   * Campos obligatorios. Sus datos serán tratados de forma confidencial.
                 </p>
