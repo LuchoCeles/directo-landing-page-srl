@@ -19,7 +19,7 @@ const Header = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ 
+      element.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
@@ -28,12 +28,11 @@ const Header = () => {
   };
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-background/95 backdrop-blur-sm shadow-elegant border-b border-border" 
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+          ? "bg-background/95 backdrop-blur-sm shadow-elegant border-b border-border"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
@@ -137,18 +136,6 @@ const Header = () => {
                 >
                   Contacto
                 </Button>
-                <div className="border-t border-border pt-4">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      window.open('/admin', '_blank');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="justify-start text-sm text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                  >
-                    Admin
-                  </Button>
-                </div>
               </div>
             </SheetContent>
           </Sheet>
