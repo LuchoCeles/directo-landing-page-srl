@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,76 +6,79 @@ import { Save, Edit, Clock } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Schedule } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
-import { AddScheduleForm } from "./AddSchedule"
-import { Plus, Trash2 } from 'lucide-react';
-import { DELETE } from "../../services/fetch.js";
+import { PATCH } from "../../services/fetch.js"
 
 const ScheduleManager = () => {
   const { adminData, updateSchedule } = useAdmin();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [editSchedule, setEditSchedule] = useState<Schedule[]>(adminData.schedule);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [originalSchedule, setOriginalSchedule] = useState<Schedule[]>(adminData.schedule);
 
-  const handleAddSuccess = () => {
-    setShowAddForm(false);
-  };
-
-  const handleSave = () => {
-    updateSchedule(editSchedule);
-    setIsEditing(false);
-    toast({
-      title: "Horarios actualizados",
-      description: "Los horarios de atención han sido guardados correctamente",
-    });
-  };
-
-  const handleDeleteSucursal = async (sucursal: string) => {
+  
+  const handleSave = async () => {
     try {
-      // Filtrar los horarios de la sucursal a eliminar
-      const horariosAEliminar = adminData.schedule.filter(s => s.sucursal === sucursal);
+      // Filtrar solo los horarios modificados
+      const modifiedSchedules = editSchedule.filter((schedule, index) => {
+        return schedule.horario !== originalSchedule[index].horario;
+      });
 
-      const deletePromises = horariosAEliminar.map(horario =>
-        DELETE(`/admin/horarios/${horario.id}`)
-      );
+      if (modifiedSchedules.length === 0) {
+        setIsEditing(false);
+        return toast({
+          title: "Sin cambios",
+          description: "No se detectaron cambios en los horarios",
+        });
+      }
 
-      const results = await Promise.all(deletePromises);
-      const allSuccess = results.every(r => r.ok);
+      const response = await PATCH('/admin/horarios', { 
+        schedules: modifiedSchedules 
+      });
 
-      if (allSuccess) {
-        const updatedSchedules = adminData.schedule.filter(s => s.sucursal !== sucursal);
-        updateSchedule(updatedSchedules);
-
+      if (response.ok) {
+        updateSchedule(editSchedule);
+        setOriginalSchedule(editSchedule); // Actualizar la referencia original
+        setIsEditing(false);
         toast({
-          title: "Sucursal eliminada",
-          description: `La sucursal ${sucursal} y sus horarios han sido eliminados`,
+          title: "Horarios actualizados",
+          description: `Se actualizaron ${modifiedSchedules.length} horarios`,
         });
       } else {
-        throw new Error('Error al eliminar algunos horarios');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al actualizar elemento');
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "No se pudo eliminar la sucursal",
+        description: error.message || "No se pudo actualizar el elemento",
         variant: "destructive"
       });
     }
   };
 
   const handleCancel = () => {
-    setEditSchedule(adminData.schedule);
+    setEditSchedule(originalSchedule);
     setIsEditing(false);
   };
 
-  const updateLocationSchedule = (location: string, day: string, value: string) => {
-    setEditSchedule({
-      ...editSchedule,
-      [location]: {
-        ...editSchedule[location],
-        [day]: value
-      }
-    });
+  const updateLocationSchedule = (sucursal: string, dia: string, value: string) => {
+    setEditSchedule(prev =>
+      prev.map(schedule =>
+        schedule.sucursal === sucursal && schedule.dia === dia
+          ? { ...schedule, horario: value }
+          : schedule
+      )
+    );
+  };
+
+  // Agrupar horarios por sucursal
+  const getSucursalesUnicas = () => {
+    const sucursales = editSchedule.map(s => s.sucursal);
+    return [...new Set(sucursales)];
+  };
+
+  const getHorariosPorSucursal = (sucursal: string) => {
+    return editSchedule.filter(s => s.sucursal === sucursal);
   };
 
   return (
@@ -83,16 +86,6 @@ const ScheduleManager = () => {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-foreground">Gestión de Horarios</h3>
         <div className="flex mr-1">
-          <div className="mr-6">
-            {!showAddForm && (
-              <Button onClick={() => setShowAddForm(!isCreating)}
-                className="flex items-center space-x-2"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Agregar Sucursal
-              </Button>
-            )}
-          </div>
           <Button
             onClick={() => setIsEditing(!isEditing)}
             variant={isEditing ? "outline" : "default"}
@@ -111,14 +104,8 @@ const ScheduleManager = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {adminData.schedule.map((locationSchedules, index) => {
-          const sucursal = locationSchedules.sucursal;
-          const horarios = adminData.schedule.filter(s => s.sucursal === sucursal);
-
-          // Solo mostrar una tarjeta por sucursal (evitar duplicados)
-          if (adminData.schedule.findIndex(s => s.sucursal === sucursal) !== index) {
-            return null;
-          }
+        {getSucursalesUnicas().map((sucursal) => {
+          const horarios = getHorariosPorSucursal(sucursal);
 
           return (
             <Card key={sucursal} className="shadow-card-custom">
@@ -127,7 +114,6 @@ const ScheduleManager = () => {
                   <Clock className="w-5 h-5 text-primary" />
                   <span>📍 {sucursal}</span>
                 </CardTitle>
-
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -156,26 +142,11 @@ const ScheduleManager = () => {
                     ))}
                   </div>
                 )}
-                {isEditing && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteSucursal(sucursal)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span>Eliminar Sucursal</span>
-                  </Button>
-                )}
               </CardContent>
             </Card>
           );
         })}
       </div>
-
-      {showAddForm && (
-        <AddScheduleForm onAddSuccess={handleAddSuccess} onCancel={() => setShowAddForm(false)} />
-      )}
 
       {isEditing && (
         <div className="flex justify-center space-x-4">
