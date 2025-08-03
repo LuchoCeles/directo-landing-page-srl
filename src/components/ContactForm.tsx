@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { POST } from "../services/fetch.js";
 import { Mail } from "@/types/admin.js";
+
+// Constante para el cooldown (5 minutos en milisegundos)
+const COOLDOWN_TIME = 5 * 60 * 1000;
 
 const ContactForm = () => {
   const { toast } = useToast();
@@ -18,6 +21,28 @@ const ContactForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Mail>>({});
+  const [lastSubmissionTime, setLastSubmissionTime] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  // Efecto para manejar el contador regresivo
+  useEffect(() => {
+    if (!lastSubmissionTime) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - lastSubmissionTime;
+      const remaining = COOLDOWN_TIME - elapsed;
+
+      if (remaining <= 0) {
+        setTimeLeft(0);
+        clearInterval(interval);
+      } else {
+        setTimeLeft(remaining);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastSubmissionTime]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -53,6 +78,17 @@ const ContactForm = () => {
     
     if (!validateForm()) return;
 
+    // Verificar cooldown
+    const now = Date.now();
+    if (lastSubmissionTime && (now - lastSubmissionTime) < COOLDOWN_TIME) {
+      toast({
+        title: "Espere un momento",
+        description: `Por favor espere ${Math.ceil(timeLeft / 1000 / 60)} minutos antes de enviar otro mensaje.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -71,6 +107,9 @@ const ContactForm = () => {
           phone: "",
           message: ""
         });
+        
+        // Establecer el tiempo del último envío
+        setLastSubmissionTime(Date.now());
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "Error al enviar el mensaje");
@@ -84,6 +123,13 @@ const ContactForm = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Función para formatear el tiempo restante
+  const formatTimeLeft = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   return (
@@ -107,7 +153,7 @@ const ContactForm = () => {
                   onChange={handleChange}
                   placeholder="Su nombre completo"
                   className="border-border focus:ring-primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || timeLeft > 0}
                 />
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
               </div>
@@ -121,7 +167,7 @@ const ContactForm = () => {
                   onChange={handleChange}
                   placeholder="Nombre de la empresa"
                   className="border-border focus:ring-primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || timeLeft > 0}
                 />
               </div>
             </div>
@@ -137,7 +183,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 placeholder="correo@empresa.com"
                 className="border-border focus:ring-primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || timeLeft > 0}
               />
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
@@ -153,7 +199,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 placeholder="+54 XXX XXX-XXXX"
                 className="border-border focus:ring-primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || timeLeft > 0}
               />
             </div>
 
@@ -168,7 +214,7 @@ const ContactForm = () => {
                 placeholder="Describa su consulta o requerimiento..."
                 rows={5}
                 className="border-border focus:ring-primary resize-none"
-                disabled={isSubmitting}
+                disabled={isSubmitting || timeLeft > 0}
               />
               {errors.message && <p className="text-sm text-red-500">{errors.message}</p>}
             </div>
@@ -177,10 +223,17 @@ const ContactForm = () => {
               type="submit"
               size="lg"
               className="w-full bg-primary hover:bg-primary/90 shadow-elegant mt-4"
-              disabled={isSubmitting}
+              disabled={isSubmitting || timeLeft > 0}
             >
-              {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
+              {timeLeft > 0 ? `Espere ${formatTimeLeft(timeLeft)}` : 
+               isSubmitting ? "Enviando..." : "Enviar Mensaje"}
             </Button>
+
+            {timeLeft > 0 && (
+              <p className="text-sm text-muted-foreground mt-2 text-center">
+                Para prevenir spam, puedes enviar otro mensaje en {formatTimeLeft(timeLeft)}
+              </p>
+            )}
 
             <p className="text-xs text-muted-foreground mt-4">
               * Campos obligatorios. Sus datos serán tratados de forma confidencial.
