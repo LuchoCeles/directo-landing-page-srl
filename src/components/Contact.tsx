@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MessageCircle, MapPin } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
+import ContactForm from "./ContactForm";
 
 const Contact = () => {
   const { adminData } = useAdmin();
@@ -103,81 +104,8 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div>
-            <Card className="shadow-card-custom">
-              <CardHeader>
-                <CardTitle className="text-2xl text-foreground">
-                  Envíanos un Mensaje
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Nombre *
-                    </label>
-                    <Input
-                      placeholder="Su nombre completo"
-                      className="border-border focus:ring-primary"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Empresa
-                    </label>
-                    <Input
-                      placeholder="Nombre de la empresa"
-                      className="border-border focus:ring-primary"
-                    />
-                  </div>
-                </div>
+          <ContactForm />
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Email *
-                  </label>
-                  <Input
-                    type="email"
-                    placeholder="correo@empresa.com"
-                    className="border-border focus:ring-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Teléfono
-                  </label>
-                  <Input
-                    type="tel"
-                    placeholder="+54 XXX XXX-XXXX"
-                    className="border-border focus:ring-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    Mensaje *
-                  </label>
-                  <Textarea
-                    placeholder="Describa su consulta o requerimiento..."
-                    rows={5}
-                    className="border-border focus:ring-primary resize-none"
-                  />
-                </div>
-
-                <Button
-                  size="lg"
-                  className="w-full bg-primary hover:bg-primary/90 shadow-elegant"
-                >
-                  Enviar Mensaje
-                </Button>
-
-                <p className="text-xs text-muted-foreground">
-                  * Campos obligatorios. Sus datos serán tratados de forma confidencial.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </section>
