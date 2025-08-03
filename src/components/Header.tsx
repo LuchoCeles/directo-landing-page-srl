@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, X } from "lucide-react";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +24,7 @@ const Header = () => {
         block: "start"
       });
     }
+    setIsMobileMenuOpen(false); // Cerrar menú móvil después de navegar
   };
 
   return (
@@ -46,62 +50,115 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
             <Button
               variant="ghost"
               onClick={() => scrollToSection("inicio")}
-              className="text-foreground hover:text-primary transition-fast"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast"
             >
               Inicio
             </Button>
             <Button
               variant="ghost"
               onClick={() => scrollToSection("sobre-nosotros")}
-              className="text-foreground hover:text-primary transition-fast"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast"
             >
               Sobre Nosotros
             </Button>
             <Button
               variant="ghost"
               onClick={() => scrollToSection("sucursales")}
-              className="text-foreground hover:text-primary transition-fast"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast"
             >
               Sucursales
             </Button>
             <Button
               variant="ghost"
               onClick={() => scrollToSection("horarios")}
-              className="text-foreground hover:text-primary transition-fast"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast"
             >
               Horarios
             </Button>
             <Button
               variant="ghost"
               onClick={() => scrollToSection("contacto")}
-              className="text-foreground hover:text-primary transition-fast"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast"
             >
               Contacto
             </Button>
             <Button
               variant="ghost"
               onClick={() => window.open('/admin', '_blank')}
-              className="text-foreground hover:text-primary transition-fast text-xs"
+              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast text-xs"
             >
               Admin
             </Button>
           </nav>
 
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </Button>
+          {/* Mobile Navigation */}
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden text-foreground"
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <div className="flex flex-col space-y-4 mt-8">
+                <Button
+                  variant="ghost"
+                  onClick={() => scrollToSection("inicio")}
+                  className="justify-start text-lg text-foreground hover:text-accent-foreground hover:bg-accent"
+                >
+                  Inicio
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => scrollToSection("sobre-nosotros")}
+                  className="justify-start text-lg text-foreground hover:text-accent-foreground hover:bg-accent"
+                >
+                  Sobre Nosotros
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => scrollToSection("sucursales")}
+                  className="justify-start text-lg text-foreground hover:text-accent-foreground hover:bg-accent"
+                >
+                  Sucursales
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => scrollToSection("horarios")}
+                  className="justify-start text-lg text-foreground hover:text-accent-foreground hover:bg-accent"
+                >
+                  Horarios
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => scrollToSection("contacto")}
+                  className="justify-start text-lg text-foreground hover:text-accent-foreground hover:bg-accent"
+                >
+                  Contacto
+                </Button>
+                <div className="border-t border-border pt-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      window.open('/admin', '_blank');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="justify-start text-sm text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                  >
+                    Admin
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
