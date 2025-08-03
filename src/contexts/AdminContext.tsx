@@ -54,7 +54,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ]);
       
       setAdminData({ carousel, contact, schedule, about });
-      console.log(adminData);
+
     } catch (error) {
       console.error("Error cargando datos:", error);
     } finally {

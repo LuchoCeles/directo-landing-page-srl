@@ -1,66 +1,100 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Save, Edit, Eye } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useToast } from "@/hooks/use-toast";
-import { PATCH } from "../../services/fetch.js"
+import { PATCH } from "../../services/fetch.js";
+
 const AboutManager = () => {
   const { adminData, updateAbout } = useAdmin();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(adminData.about);
+  const [originalContent, setOriginalContent] = useState(adminData.about);
+
+  // Inicializar estados cuando cambian los datos del admin
+  useEffect(() => {
+    setEditContent(adminData.about);
+    setOriginalContent(adminData.about);
+  }, [adminData.about]);
+
+  // Verificar si hay cambios entre el contenido editado y el original
+  const hasChanges = () => {
+    return editContent.content !== originalContent.content;
+  };
 
   const handleSave = async () => {
+    // Verificar si hay cambios antes de enviar
+    if (!hasChanges()) {
+      toast({
+        title: "Sin cambios",
+        description: "No se detectaron modificaciones para guardar",
+      });
+      setIsEditing(false);
+      return;
+    }
+
     try {
       const response = await PATCH("/admin/about", editContent);
       if (response.ok) {
-        setEditContent(adminData.about);
         updateAbout(editContent);
+        setOriginalContent(editContent);
         setIsEditing(false);
         toast({
           title: "Contenido actualizado",
           description: "La sección 'Sobre Nosotros' ha sido actualizada correctamente",
         });
+      } else {
+        throw new Error("Error al actualizar el contenido");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "No se pudo actualizar el elemento del carrusel",
+        description: error.message || "No se pudo actualizar el contenido",
         variant: "destructive"
       });
     }
   };
 
   const handleCancel = () => {
-    setEditContent(adminData.about);
+    setEditContent(originalContent);
     setIsEditing(false);
+  };
+
+  const toggleEditMode = () => {
+    if (isEditing && hasChanges()) {
+      // Preguntar antes de descartar cambios
+      if (confirm("¿Estás seguro de que deseas descartar los cambios?")) {
+        handleCancel();
+      }
+    } else {
+      setIsEditing(!isEditing);
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-foreground">Gestión de "Sobre Nosotros"</h3>
-        {isEditing ? (
-          <Button
-            onClick={() => setIsEditing(!isEditing)}
-            variant={isEditing ? "outline" : "default"}
-            className="flex items-center space-x-2"
-          >
-            <Eye className="w-4 h-4" />
-            <span>Vista Previa</span>
-          </Button>
-        ) : (
-          <Button
-            onClick={() => setIsEditing(!isEditing)}
-            variant={isEditing ? "outline" : "default"}
-            className="flex items-center space-x-2"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Editar Contenido</span>
-          </Button>
-        )}
+        <Button
+          onClick={toggleEditMode}
+          variant={isEditing ? "outline" : "default"}
+          className="flex items-center space-x-2"
+        >
+          {isEditing ? (
+            <>
+              <Eye className="w-4 h-4" />
+              <span>Vista Previa</span>
+            </>
+          ) : (
+            <>
+              <Edit className="w-4 h-4" />
+              <span>Editar Contenido</span>
+            </>
+          )}
+        </Button>
       </div>
 
       <Card className="shadow-card-custom">
@@ -88,7 +122,11 @@ const AboutManager = () => {
               </div>
 
               <div className="flex space-x-2">
-                <Button onClick={handleSave} className="flex items-center space-x-2">
+                <Button 
+                  onClick={handleSave} 
+                  className="flex items-center space-x-2"
+                  disabled={!hasChanges()}
+                >
                   <Save className="w-4 h-4" />
                   <span>Guardar Cambios</span>
                 </Button>

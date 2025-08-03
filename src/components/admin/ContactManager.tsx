@@ -56,7 +56,7 @@ const ContactManager = () => {
 
     try {
       const modifiedContacts = getModifiedContacts();
-      console.log(modifiedContacts);
+
       const response = await PATCH("/admin/contacto", modifiedContacts);
       
       if (response.ok) {

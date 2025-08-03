@@ -13,11 +13,30 @@ const CarouselManager = () => {
   const { adminData, updateCarousel } = useAdmin();
   const { toast } = useToast();
   const [editingItem, setEditingItem] = useState<CarouselItem | null>(null);
+  const [originalEditingItem, setOriginalEditingItem] = useState<CarouselItem | null>(null);
   const [newItem, setNewItem] = useState<Partial<CarouselItem>>({});
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Detectar cambios en el ítem que se está editando
+  const hasChanges = () => {
+    if (!editingItem || !originalEditingItem) return false;
+
+    return (
+      editingItem.title !== originalEditingItem.title ||
+      editingItem.description !== originalEditingItem.description ||
+      editingItem.imageFile !== null
+    );
+  };
+
+  // Cuando se selecciona un ítem para editar, guardar su estado original
+  useEffect(() => {
+    if (editingItem) {
+      setOriginalEditingItem({ ...editingItem });
+    }
+  }, [editingItem]);
 
   // Manejar errores de carga de imágenes
   const handleImageError = (id: string) => {
@@ -47,7 +66,6 @@ const CarouselManager = () => {
       return;
     }
 
-    // Para vista previa (opcional, solo para UI)
     const previewUrl = URL.createObjectURL(file);
 
     if (isEditing && editingItem) {
@@ -107,6 +125,16 @@ const CarouselManager = () => {
 
   const handleUpdate = async () => {
     if (!editingItem) return;
+
+    // Verificar si hay cambios antes de enviar
+    if (!hasChanges()) {
+      toast({
+        title: "Sin cambios",
+        description: "No se detectaron cambios para guardar",
+      });
+      setEditingItem(null);
+      return;
+    }
 
     const formData = new FormData();
     if (editingItem.imageFile) {
