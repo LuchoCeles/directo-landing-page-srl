@@ -7,7 +7,8 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { Schedule } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
 import { AddScheduleForm } from "./AddSchedule"
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { DELETE } from "../../services/fetch.js";
 
 const ScheduleManager = () => {
   const { adminData, updateSchedule } = useAdmin();
@@ -28,6 +29,38 @@ const ScheduleManager = () => {
       title: "Horarios actualizados",
       description: "Los horarios de atención han sido guardados correctamente",
     });
+  };
+
+  const handleDeleteSucursal = async (sucursal: string) => {
+    try {
+      // Filtrar los horarios de la sucursal a eliminar
+      const horariosAEliminar = adminData.schedule.filter(s => s.sucursal === sucursal);
+
+      const deletePromises = horariosAEliminar.map(horario =>
+        DELETE(`/admin/horarios/${horario.id}`)
+      );
+
+      const results = await Promise.all(deletePromises);
+      const allSuccess = results.every(r => r.ok);
+
+      if (allSuccess) {
+        const updatedSchedules = adminData.schedule.filter(s => s.sucursal !== sucursal);
+        updateSchedule(updatedSchedules);
+
+        toast({
+          title: "Sucursal eliminada",
+          description: `La sucursal ${sucursal} y sus horarios han sido eliminados`,
+        });
+      } else {
+        throw new Error('Error al eliminar algunos horarios');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo eliminar la sucursal",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -89,11 +122,12 @@ const ScheduleManager = () => {
 
           return (
             <Card key={sucursal} className="shadow-card-custom">
-              <CardHeader>
+              <CardHeader className="flex justify-between items-start">
                 <CardTitle className="flex items-center space-x-2">
                   <Clock className="w-5 h-5 text-primary" />
                   <span>📍 {sucursal}</span>
                 </CardTitle>
+
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
@@ -122,11 +156,23 @@ const ScheduleManager = () => {
                     ))}
                   </div>
                 )}
+                {isEditing && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteSucursal(sucursal)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Eliminar Sucursal</span>
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
         })}
       </div>
+
       {showAddForm && (
         <AddScheduleForm onAddSuccess={handleAddSuccess} onCancel={() => setShowAddForm(false)} />
       )}
@@ -143,7 +189,6 @@ const ScheduleManager = () => {
         </div>
       )}
 
-      {/* Guidelines */}
       <Card className="bg-green-50 border-green-200">
         <CardHeader>
           <CardTitle className="text-green-800">Guía Recomendada</CardTitle>
@@ -154,7 +199,6 @@ const ScheduleManager = () => {
             <li>• Para días cerrados escriba simplemente: "Cerrado"</li>
             <li>• Mantenga consistencia en el formato entre sucursales</li>
             <li>• Use el guión largo (–) para separar horarios de inicio y fin</li>
-            <li>• Para agregar más dias a una misma sucursal solo debe agregar otra sucursal y colocar el mismo nombre pero con el horario faltante</li>
           </ul>
         </CardContent>
       </Card>

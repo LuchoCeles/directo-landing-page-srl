@@ -15,6 +15,7 @@ export interface ContactInfo {
 }
 
 export interface Schedule {
+  id?:string;
   sucursal:string;
   dia:string;
   horario:string;

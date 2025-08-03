@@ -11,18 +11,29 @@ import { POST } from "../../services/fetch.js"
 
 export const AddScheduleForm = ({ onAddSuccess, onCancel }: { onAddSuccess: () => void; onCancel: () => void; }) => {
   const { adminData, updateSchedule } = useAdmin();
-  const [newSchedule, setNewSchedule] = useState<Schedule>({
-    sucursal: '',
-    dia: '',
-    horario: ''
-  });
+  const [newSchedules, setNewSchedules] = useState<Schedule[]>([
+    { sucursal: '', dia: 'Lunes a Viernes', horario: '' },
+    { sucursal: '', dia: 'Sábado', horario: '' },
+    { sucursal: '', dia: 'Domingo', horario: '' }
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewSchedule(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (index: number, field: keyof Schedule, value: string) => {
+    const updatedSchedules = [...newSchedules];
+    updatedSchedules[index] = { ...updatedSchedules[index], [field]: value };
+    
+    // Actualizar sucursal en todos los horarios si se cambia en el primero
+    if (field === 'sucursal' && index === 0) {
+      updatedSchedules.forEach((schedule, i) => {
+        if (i !== 0) {
+          updatedSchedules[i] = { ...schedule, sucursal: value };
+        }
+      });
+    }
+    
+    setNewSchedules(updatedSchedules);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,25 +42,49 @@ export const AddScheduleForm = ({ onAddSuccess, onCancel }: { onAddSuccess: () =
     setError('');
 
     try {
-      const response = await POST('/admin/horarios', newSchedule);
-
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: "Error al Agregar una Sucursal",
-          variant: "destructive"
-        });
+      // Validar que la sucursal esté completa
+      if (!newSchedules[0].sucursal) {
+        throw new Error('Debe ingresar el nombre de la sucursal');
       }
-      const updatedSchedules = [...adminData.schedule, newSchedule];
+
+      // Validar horarios
+      const hasEmptySchedule = newSchedules.some(schedule => !schedule.horario);
+      if (hasEmptySchedule) {
+        throw new Error('Todos los horarios deben ser completados');
+      }
+
+      // Enviar cada horario al servidor
+      const responses = await Promise.all(
+        newSchedules.map(schedule => POST('/admin/horarios', schedule))
+      );
+
+      const hasError = responses.some(response => !response.ok);
+      if (hasError) {
+        throw new Error('Error al agregar algunos horarios');
+      }
+
+      // Combinar con los horarios existentes
+      const updatedSchedules = [...adminData.schedule, ...newSchedules];
       updateSchedule(updatedSchedules);
-      setNewSchedule({ sucursal: '', dia: '', horario: '' });
+      
+      // Resetear formulario
+      setNewSchedules([
+        { sucursal: '', dia: 'Lunes a Viernes', horario: '' },
+        { sucursal: '', dia: 'Sábado', horario: '' },
+        { sucursal: '', dia: 'Domingo', horario: '' }
+      ]);
+      
       onAddSuccess();
       toast({
-        title: "Contenido Agregado",
-        description: "Los horarios de atención han sido guardados correctamente"
+        title: "Horarios agregados",
+        description: "Los horarios han sido guardados correctamente"
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : 'Error desconocido',
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -65,47 +100,35 @@ export const AddScheduleForm = ({ onAddSuccess, onCancel }: { onAddSuccess: () =
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nombre de la sucursal (solo en el primer horario) */}
           <div className="space-y-2">
             <label htmlFor="sucursal" className="block text-sm font-medium">
               Nombre de la Sucursal
             </label>
             <Input
               id="sucursal"
-              name="sucursal"
-              value={newSchedule.sucursal}
-              onChange={handleInputChange}
+              value={newSchedules[0].sucursal}
+              onChange={(e) => handleInputChange(0, 'sucursal', e.target.value)}
               required
               placeholder="Ej: Rosario Centro"
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="dia" className="block text-sm font-medium">
-              Dias Abierto
-            </label>
-            <Input
-              id="dia"
-              name="dia"
-              value={newSchedule.dia}
-              onChange={handleInputChange}
-              required
-              placeholder="Ej: Lunes a Viernes"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="horario" className="block text-sm font-medium">
-              Horario
-            </label>
-            <Input
-              id="horario"
-              name="horario"
-              value={newSchedule.horario}
-              onChange={handleInputChange}
-              required
-              placeholder="Ej: 08:00 – 16:00"
-            />
-          </div>
+          {/* Horarios */}
+          {newSchedules.map((schedule, index) => (
+            <div key={index} className="space-y-2">
+              <label htmlFor={`dia-${index}`} className="block text-sm font-medium">
+                {schedule.dia}
+              </label>
+              <Input
+                id={`horario-${index}`}
+                value={schedule.horario}
+                onChange={(e) => handleInputChange(index, 'horario', e.target.value)}
+                required
+                placeholder={index === 2 ? 'Ej: Cerrado' : 'Ej: 08:00 – 16:00'}
+              />
+            </div>
+          ))}
 
           <div className="flex justify-start space-x-4 pt-4">
             <Button type="submit" disabled={isLoading}>
