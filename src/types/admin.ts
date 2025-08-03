@@ -18,7 +18,7 @@ export interface ContactInfo {
 
 export interface Mail {
   name: string;
-  telefono: string;
+  phone: string;
   email: string;
   company: string;
   message: string;

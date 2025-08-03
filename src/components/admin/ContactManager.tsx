@@ -7,24 +7,84 @@ import { Save, Edit, Phone, Mail, MessageCircle, MapPin } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useToast } from "@/hooks/use-toast";
 import { ContactInfo } from "@/types/admin";
+import { PATCH } from "../../services/fetch.js"
+
 
 const ContactManager = () => {
   const { adminData, updateContact } = useAdmin();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editContacts, setEditContacts] = useState<ContactInfo[]>(adminData.contact);
+  const [originalContacts, setOriginalContacts] = useState<ContactInfo[]>(adminData.contact);
 
-  const handleSave = () => {
-    updateContact(editContacts);
-    setIsEditing(false);
-    toast({
-      title: "Información de contacto actualizada",
-      description: "Los datos de contacto han sido guardados correctamente",
+  const hasChanges = () => {
+    if (originalContacts.length !== editContacts.length) return true;
+
+    return editContacts.some((contact, index) => {
+      const originalContact = originalContacts[index];
+      return (
+        contact.telefono !== originalContact.telefono ||
+        contact.email !== originalContact.email ||
+        contact.whatsapp !== originalContact.whatsapp ||
+        contact.address !== originalContact.address
+      );
     });
   };
 
+  // Obtener solo los contactos modificados
+  const getModifiedContacts = () => {
+    return editContacts.filter((contact, index) => {
+      const originalContact = originalContacts[index];
+      return (
+        contact.telefono !== originalContact.telefono ||
+        contact.email !== originalContact.email ||
+        contact.whatsapp !== originalContact.whatsapp ||
+        contact.address !== originalContact.address
+      );
+    });
+  };
+
+  const handleSave = async () => {
+    if (!hasChanges()) {
+      toast({
+        title: "Sin cambios",
+        description: "No se detectaron cambios para guardar",
+      });
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      const modifiedContacts = getModifiedContacts();
+
+      const response = await PATCH("/admin/contacto", modifiedContacts);
+      
+      if (response.ok) {
+        updateContact(editContacts);
+        setOriginalContacts(editContacts);
+        setIsEditing(false);
+        toast({
+          title: "Información de contacto actualizada",
+          description: "Los datos de contacto han sido guardados correctamente",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No se pudo actualizar la información de contacto",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Error al cargar los datos. ${error}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCancel = () => {
-    setEditContacts(adminData.contact);
+    setEditContacts(adminData.contact || []);
     setIsEditing(false);
   };
 
@@ -36,28 +96,31 @@ const ContactManager = () => {
     );
   };
 
+  if (!adminData.contact || adminData.contact.length === 0) {
+    return <div>No hay datos de contacto disponibles</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-foreground">Gestión de Contacto</h3>
-        <Button
-          onClick={() => setIsEditing(!isEditing)}
-          variant={isEditing ? "outline" : "default"}
-          className="flex items-center space-x-2"
-        >
-          {isEditing ? (
-            <span>Cancelar</span>
-          ) : (
-            <>
-              <Edit className="w-4 h-4" />
-              <span>Editar Información</span>
-            </>
-          )}
-        </Button>
+        {!isEditing ? (
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center space-x-2"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Editar Información</span>
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancelar
+          </Button>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {adminData.contact.map((contact) => (
+        {editContacts.map((contact) => (
           <Card key={contact.id} className="shadow-card-custom">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -74,7 +137,7 @@ const ContactManager = () => {
                       <span>Teléfono</span>
                     </label>
                     <Input
-                      value={contact.telefono}
+                      value={contact.telefono || ''}
                       onChange={(e) => updateField(contact.id, 'telefono', e.target.value)}
                       placeholder="+54 341 1234567"
                     />
@@ -87,7 +150,7 @@ const ContactManager = () => {
                     </label>
                     <Input
                       type="email"
-                      value={contact.email}
+                      value={contact.email || ''}
                       onChange={(e) => updateField(contact.id, 'email', e.target.value)}
                       placeholder="sucursal@transporteedirecto.com"
                     />
@@ -99,7 +162,7 @@ const ContactManager = () => {
                       <span>WhatsApp</span>
                     </label>
                     <Input
-                      value={contact.whatsapp}
+                      value={contact.whatsapp || ''}
                       onChange={(e) => updateField(contact.id, 'whatsapp', e.target.value)}
                       placeholder="+543414397465"
                     />
@@ -108,7 +171,7 @@ const ContactManager = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Dirección</label>
                     <Textarea
-                      value={contact.address}
+                      value={contact.address || ''}
                       onChange={(e) => updateField(contact.id, 'address', e.target.value)}
                       placeholder="Calle, número, ciudad"
                       rows={3}
