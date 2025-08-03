@@ -87,13 +87,6 @@ const Header = () => {
             >
               Contacto
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => window.open('/admin', '_blank')}
-              className="text-foreground hover:text-accent-foreground hover:bg-accent transition-fast text-xs"
-            >
-              Admin
-            </Button>
           </nav>
 
           {/* Mobile Navigation */}
