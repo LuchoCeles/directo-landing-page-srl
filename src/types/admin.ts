@@ -8,10 +8,12 @@ export interface CarouselItem {
 }
 
 export interface ContactInfo {
+  id:string;
+  sucursal?:string;
   telefono: string;
   email: string;
   whatsapp: string;
-  Address: string;
+  address: string;
 }
 
 export interface Schedule {
@@ -28,7 +30,7 @@ export interface AboutContent {
 
 export interface AdminData {
   carousel: CarouselItem[];
-  contact: ContactInfo;
+  contact: ContactInfo[];
   schedule: Schedule[];
   about: AboutContent;
 }

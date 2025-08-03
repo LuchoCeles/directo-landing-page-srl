@@ -8,7 +8,7 @@ interface AdminContextType {
   login: (user: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateCarousel: (carousel: CarouselItem[]) => void;
-  updateContact: (contact: ContactInfo) => void;
+  updateContact: (contact: ContactInfo[]) => void;
   updateSchedule: (schedule: Schedule[]) => void;
   updateAbout: (about: AboutContent) => void;
 }
@@ -18,12 +18,7 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 const defaultAdminData: AdminData = {
   carousel: [],
-  contact: {
-    telefono: "",
-    email: "",
-    whatsapp: "",
-    Address: "",
-  },
+  contact: [],
   schedule: [],
   about: {
     id: "",
@@ -191,18 +186,34 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const getContact = async (): Promise<ContactInfo> => {
+  const getContact = async (): Promise<ContactInfo[]> => {
     try {
       const response = await GET('/api/contacto');
       if (!response.ok) {
-        console.error('Error al cargar el contacto:', response.statusText);
-        return defaultAdminData.contact;
+        console.error('Error al cargar el contacto:', response.status, response.statusText);
+        return [];
       }
-      const data = await response.json();
-      return data as ContactInfo;
+
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as ContactInfo[];
+      }
+
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as ContactInfo[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
     } catch (error) {
       console.error('Error cargando el contacto:', error);
-      return defaultAdminData.contact;
+      return [];
     }
   };
 
@@ -221,7 +232,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveAdminData(newData);
   };
 
-  const updateContact = (contact: ContactInfo) => {
+  const updateContact = (contact: ContactInfo[]) => {
     const newData = { ...adminData, contact };
     saveAdminData(newData);
   };
