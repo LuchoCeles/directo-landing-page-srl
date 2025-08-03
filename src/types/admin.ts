@@ -8,19 +8,27 @@ export interface CarouselItem {
 }
 
 export interface ContactInfo {
-  id:string;
-  sucursal?:string;
+  id: string;
+  sucursal?: string;
   telefono: string;
   email: string;
   whatsapp: string;
   address: string;
 }
 
+export interface Mail {
+  name: string;
+  telefono: string;
+  email: string;
+  company: string;
+  message: string;
+}
+
 export interface Schedule {
-  id?:string;
-  sucursal:string;
-  dia:string;
-  horario:string;
+  id?: string;
+  sucursal: string;
+  dia: string;
+  horario: string;
 }
 
 export interface AboutContent {
