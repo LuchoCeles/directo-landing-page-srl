@@ -9,35 +9,31 @@ const Contact = () => {
   const { adminData } = useAdmin();
   
   const contactInfo = [
-    {
+    ...(adminData.contact as unknown as any[]).map(contact => ({
       icon: Phone,
-      title: "Rosario",
-      content: adminData.contact.rosarioPhone,
-      action: `tel:${adminData.contact.rosarioPhone.replace(/\s/g, '')}`
-    },
-    {
-      icon: Phone,
-      title: "Mar del Plata",
-      content: adminData.contact.marDelPlataPhone,
-      action: `tel:${adminData.contact.marDelPlataPhone.replace(/\s/g, '')}`
-    },
-    {
+      title: contact.sucursal || "Sucursal",
+      content: contact.telefono,
+      action: `tel:${contact.telefono.replace(/\s/g, '')}`
+    })),
+    ...((adminData.contact as unknown as any[]).length > 0 ? [{
       icon: Mail,
       title: "Email",
-      content: adminData.contact.email,
-      action: `mailto:${adminData.contact.email}`
-    },
-    {
+      content: (adminData.contact as unknown as any[])[0].email,
+      action: `mailto:${(adminData.contact as unknown as any[])[0].email}`
+    }] : []),
+    ...((adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp ? [{
       icon: MessageCircle,
       title: "WhatsApp",
       content: "Contacto directo",
-      action: `https://wa.me/${adminData.contact.whatsapp.replace(/\+/g, '')}`
-    }
+      action: `https://wa.me/${(adminData.contact as unknown as any[])[0].whatsapp.replace(/\+/g, '')}`
+    }] : [])
   ];
 
   const handleWhatsAppClick = () => {
-    const whatsappNumber = adminData.contact.whatsapp.replace(/\+/g, '');
-    window.open(`https://wa.me/${whatsappNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
+    if ((adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp) {
+      const whatsappNumber = (adminData.contact as unknown as any[])[0].whatsapp.replace(/\+/g, '');
+      window.open(`https://wa.me/${whatsappNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
+    }
   };
 
   return (
@@ -79,16 +75,18 @@ const Contact = () => {
             </div>
 
             {/* WhatsApp CTA */}
-            <div className="mt-8">
-              <Button
-                onClick={handleWhatsAppClick}
-                size="lg"
-                className="w-full bg-green-600 hover:bg-green-700 text-white shadow-elegant"
-              >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                Contactar por WhatsApp
-              </Button>
-            </div>
+            {(adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp && (
+              <div className="mt-8">
+                <Button
+                  onClick={handleWhatsAppClick}
+                  size="lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-elegant"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Contactar por WhatsApp
+                </Button>
+              </div>
+            )}
 
             {/* Address Section */}
             <Card className="mt-6 shadow-card-custom">
@@ -99,18 +97,14 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-foreground">📍 Rosario</h4>
-                  <p className="text-muted-foreground text-sm">
-                    {adminData.contact.rosarioAddress}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground">📍 Mar del Plata</h4>
-                  <p className="text-muted-foreground text-sm">
-                    {adminData.contact.marDelPlataAddress}
-                  </p>
-                </div>
+                {(adminData.contact as unknown as any[]).map((contact, index) => (
+                  <div key={contact.id || index}>
+                    <h4 className="font-semibold text-foreground">📍 {contact.sucursal}</h4>
+                    <p className="text-muted-foreground text-sm">
+                      {contact.address}
+                    </p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>

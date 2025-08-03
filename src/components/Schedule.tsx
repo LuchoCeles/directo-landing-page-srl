@@ -5,26 +5,23 @@ import { useAdmin } from "@/contexts/AdminContext";
 const Schedule = () => {
   const { adminData } = useAdmin();
   
-  const schedules = [
-    {
-      city: "Rosario",
-      icon: MapPin,
-      schedule: [
-        { days: "Lunes a Viernes", hours: adminData.schedule.rosario.weekdays },
-        { days: "Sábados", hours: adminData.schedule.rosario.saturday },
-        { days: "Domingos", hours: adminData.schedule.rosario.sunday }
-      ]
-    },
-    {
-      city: "Mar del Plata",
-      icon: MapPin,
-      schedule: [
-        { days: "Lunes a Viernes", hours: adminData.schedule.marDelPlata.weekdays },
-        { days: "Sábados", hours: adminData.schedule.marDelPlata.saturday },
-        { days: "Domingos", hours: adminData.schedule.marDelPlata.sunday }
-      ]
+  // Group schedules by sucursal
+  const groupedSchedules = (adminData.schedule as unknown as any[]).reduce((acc, schedule) => {
+    if (!acc[schedule.sucursal]) {
+      acc[schedule.sucursal] = [];
     }
-  ];
+    acc[schedule.sucursal].push(schedule);
+    return acc;
+  }, {} as Record<string, typeof adminData.schedule>);
+
+  const schedules = Object.entries(groupedSchedules).map(([city, scheduleList]) => ({
+    city,
+    icon: MapPin,
+    schedule: (scheduleList as any[]).map(s => ({
+      days: s.dia,
+      hours: s.horario
+    }))
+  }));
 
   return (
     <section id="horarios" className="py-20 bg-gradient-subtle">

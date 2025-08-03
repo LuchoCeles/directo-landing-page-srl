@@ -5,18 +5,11 @@ import { useAdmin } from "@/contexts/AdminContext";
 const Branches = () => {
   const { adminData } = useAdmin();
 
-  const branches = [
-    {
-      city: "Rosario",
-      address: adminData.contact.rosarioAddress,
-      phone: adminData.contact.rosarioPhone
-    },
-    {
-      city: "Mar del Plata",
-      address: adminData.contact.marDelPlataAddress,
-      phone: adminData.contact.marDelPlataPhone
-    }
-  ];
+  const branches = (adminData.contact as unknown as any[]).map(contact => ({
+    city: contact.sucursal || "Sin nombre",
+    address: contact.address,
+    phone: contact.telefono
+  }));
 
   return (
     <section id="sucursales" className="py-20 bg-background">

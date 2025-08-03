@@ -52,9 +52,12 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Contacto</h4>
             <div className="space-y-2 text-white/80 text-sm">
-              <p>📍 <strong>Rosario:</strong> {adminData.contact.telefono}</p>
-              <p>📍 <strong>Mar del Plata:</strong> {adminData.contact.telefono}</p>
-              <p>✉️ {adminData.contact.email}</p>
+              {(adminData.contact as unknown as any[]).map((contact, index) => (
+                <p key={contact.id || index}>📍 <strong>{contact.sucursal}:</strong> {contact.telefono}</p>
+              ))}
+              {(adminData.contact as unknown as any[]).length > 0 && (
+                <p>✉️ {(adminData.contact as unknown as any[])[0].email}</p>
+              )}
             </div>
           </div>
         </div>
