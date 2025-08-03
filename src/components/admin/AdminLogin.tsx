@@ -18,11 +18,11 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     // Simular delay de autenticación
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const success = login(password);
+    const success = login(user, password);
 
-    if (success) {
+    if (await success) {
       toast({
         title: "Acceso autorizado",
         description: "Bienvenido al panel administrativo",
@@ -31,7 +31,7 @@ const AdminLogin = () => {
       toast({
         title: "Acceso denegado",
         description: "Datos mal ingresados. Intente nuevamente.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
 
@@ -66,7 +66,7 @@ const AdminLogin = () => {
                   type="text"
                   value={user}
                   onChange={(e) => setUser(e.target.value)}
-                  placeholder="Ingrese la contraseña"
+                  placeholder="Ingrese el usuario"
                   className="border-border focus:ring-primary"
                   required
                   disabled={isLoading}
@@ -91,7 +91,7 @@ const AdminLogin = () => {
 
             <Button
               type="submit"
-              className="w-full shadow-elegant hover:text-white hover:bg-color-blue"
+              className="w-full shadow-elegant"
               disabled={isLoading}
             >
               {isLoading ? "Verificando..." : "Iniciar Sesión"}
@@ -100,7 +100,10 @@ const AdminLogin = () => {
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
-              <strong>Demo:</strong> Contraseña: admin123
+              <strong>Usuario:</strong> admin
+            </p>
+            <p className="text-sm text-muted-foreground text-center">
+              <strong>Contraseña:</strong> admin123
             </p>
           </div>
         </CardContent>

@@ -27,8 +27,8 @@ const AdminDashboard = () => {
               <h1 className="text-2xl font-bold text-foreground">Panel Administrativo</h1>
               <p className="text-muted-foreground">Transportadora El Directo SRL</p>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleLogout}
               className="flex items-center space-x-2"
             >
@@ -56,8 +56,8 @@ const AdminDashboard = () => {
             <CardContent className="p-6 text-center">
               <Info className="w-8 h-8 text-primary mx-auto mb-2" />
               <h3 className="font-semibold text-foreground">Contenido</h3>
-              <p className="text-2xl font-bold text-primary">✓</p>
-              <p className="text-sm text-muted-foreground">actualizado</p>
+              <p className="text-2xl font-bold text-primary">{adminData.about.content.length > 0 ? '✓' : 'X'}</p>
+              <p className="text-sm text-muted-foreground">{adminData.about.content.length > 0 ? 'actualizado' : 'desactualizado'}</p>
             </CardContent>
           </Card>
 
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
             <CardContent className="p-6 text-center">
               <Clock className="w-8 h-8 text-primary mx-auto mb-2" />
               <h3 className="font-semibold text-foreground">Horarios</h3>
-              <p className="text-2xl font-bold text-primary">2</p>
+              <p className="text-2xl font-bold text-primary">{Math.round(adminData.schedule.length / 3)}</p>
               <p className="text-sm text-muted-foreground">sucursales</p>
             </CardContent>
           </Card>

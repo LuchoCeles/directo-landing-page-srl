@@ -1,40 +1,36 @@
 export interface CarouselItem {
   id: string;
-  imageUrl: string;
+  image?: string;
   title: string;
   description: string;
   order: number;
+  imageFile: File;
 }
 
 export interface ContactInfo {
-  rosarioPhone: string;
-  marDelPlataPhone: string;
+  id:string;
+  sucursal?:string;
+  telefono: string;
   email: string;
   whatsapp: string;
-  rosarioAddress: string;
-  marDelPlataAddress: string;
+  address: string;
 }
 
 export interface Schedule {
-  rosario: {
-    weekdays: string;
-    saturday: string;
-    sunday: string;
-  };
-  marDelPlata: {
-    weekdays: string;
-    saturday: string;
-    sunday: string;
-  };
+  id?:string;
+  sucursal:string;
+  dia:string;
+  horario:string;
 }
 
 export interface AboutContent {
+  id: string;
   content: string;
 }
 
 export interface AdminData {
   carousel: CarouselItem[];
-  contact: ContactInfo;
-  schedule: Schedule;
+  contact: ContactInfo[];
+  schedule: Schedule[];
   about: AboutContent;
 }

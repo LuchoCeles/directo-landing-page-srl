@@ -1,81 +1,71 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
-import truckHero1 from "@/assets/truck-hero-1.jpg";
-import logisticsHero2 from "@/assets/logistics-hero-2.jpg";
-import fleetHero3 from "@/assets/fleet-hero-3.jpg";
+import { GET, POST, PATCH, DELETE } from '@/services/fetch';
 
 interface AdminContextType {
   isAuthenticated: boolean;
   adminData: AdminData;
-  login: (password: string) => boolean;
+  login: (user: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateCarousel: (carousel: CarouselItem[]) => void;
-  updateContact: (contact: ContactInfo) => void;
-  updateSchedule: (schedule: Schedule) => void;
+  updateContact: (contact: ContactInfo[]) => void;
+  updateSchedule: (schedule: Schedule[]) => void;
   updateAbout: (about: AboutContent) => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
+
 const defaultAdminData: AdminData = {
-  carousel: [
-    {
-      id: '1',
-      imageUrl: truckHero1,
-      title: 'Transporte nacional de carga con más de 60 años de trayectoria',
-      description: 'Experiencia y confiabilidad en cada entrega',
-      order: 1
-    },
-    {
-      id: '2',
-      imageUrl: logisticsHero2,
-      title: 'Unidades modernas y monitoreadas para mayor seguridad',
-      description: 'Tecnología de vanguardia al servicio de su carga',
-      order: 2
-    },
-    {
-      id: '3',
-      imageUrl: fleetHero3,
-      title: 'Cobertura Rosario - Mar del Plata, con logística flexible',
-      description: 'Conectamos las principales ciudades de Argentina',
-      order: 3
-    }
-  ],
-  contact: {
-    rosarioPhone: '+54 341 439‑7465',
-    marDelPlataPhone: '+54 223 477‑1190',
-    email: 'eldirecto@live.com.ar',
-    whatsapp: '+543414397465',
-    rosarioAddress: 'Dirección Rosario (editable desde panel admin)',
-    marDelPlataAddress: 'Dirección Mar del Plata (editable desde panel admin)'
-  },
-  schedule: {
-    rosario: {
-      weekdays: '07:00 – 15:30',
-      saturday: '07:00 – 11:30',
-      sunday: 'Cerrado'
-    },
-    marDelPlata: {
-      weekdays: '08:00 – 16:00',
-      saturday: '08:00 – 12:00',
-      sunday: 'Cerrado'
-    }
-  },
+  carousel: [],
+  contact: [],
+  schedule: [],
   about: {
-    content: `Desde 1960, en Transporte El Directo SRL ofrecemos soluciones logísticas seguras y eficientes, especializándonos en transporte de carga, encomiendas y servicios urbanos, interurbanos y de larga distancia.
-
-Nuestro compromiso es garantizar cada entrega con puntualidad, seriedad y el respaldo de un equipo capacitado que comprende las necesidades específicas de cada cliente.
-
-Conectamos Rosario y Mar del Plata con un servicio integral que abarca desde el transporte de mercaderías hasta la gestión logística completa, adaptándonos a los requerimientos particulares de cada empresa.`
+    id: "",
+    content: ""
   }
 };
-
-// Contraseña simple para el demo (en producción debería ser más segura)
-const ADMIN_PASSWORD = 'admin123';
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const loadInitialData = async () => {
+        try {
+          setIsLoading(true);
+
+          // Cargar todos los datos en paralelo
+          const [carousel, contact, schedule, about] = await Promise.all([
+            getCarouselItem(),
+            getContact(),
+            getSchedule(),
+            getAbout()
+          ]);
+
+          setAdminData({
+            carousel,
+            contact,
+            schedule,
+            about
+          });
+
+        } catch (error) {
+          console.error("Error cargando datos iniciales:", error);
+          // Mantener los valores por defecto si hay error
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      loadInitialData();
+      console.log('AdminProvider initialized', adminData);
+    }
+  }, [isAuthenticated]);
+
 
   useEffect(() => {
     // Verificar si está autenticado en localStorage
@@ -95,13 +85,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  const login = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem('transportadora_admin_auth', 'true');
-      return true;
+  // Funciones de autenticación
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await POST('/admin/login', { username, password });
+      if (!response.ok) {
+        return false;
+      }
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('transportadora_admin_auth', data.token);
+        setIsAuthenticated(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error durante el login:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
@@ -109,6 +110,118 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.removeItem('transportadora_admin_auth');
   };
 
+  // Funciones para obtener y actualizar datos
+  const getCarouselItem = async (): Promise<CarouselItem[]> => {
+    try {
+      const response = await POST('/api/carrusel');
+      if (!response.ok) {
+        console.error('Error al cargar el carrusel:', response.status, response.statusText);
+        return [];
+      }
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as CarouselItem[];
+      }
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as CarouselItem[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
+    } catch (error) {
+      console.error('Error cargando el carrusel:', error);
+      return [];
+    }
+  }
+
+  const getAbout = async (): Promise<AboutContent> => {
+    try {
+      const response = await GET('/api/about');
+      if (!response.ok) {
+        console.error('Error al cargar el horario:', response.statusText);
+        return defaultAdminData.about;
+      }
+      const data = await response.json();
+      return data as AboutContent;
+    } catch (error) {
+      console.error('Error cargando el horario:', error);
+      return defaultAdminData.about;
+    }
+  }
+
+  const getSchedule = async (): Promise<Schedule[]> => {
+    try {
+      const response = await GET('/api/horarios');
+      if (!response.ok) {
+        console.error('Error al cargar el horario:', response.status, response.statusText);
+        return [];
+      }
+
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as Schedule[];
+      }
+
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as Schedule[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
+    } catch (error) {
+      console.error('Error cargando el horario:', error);
+      return [];
+    }
+  };
+
+  const getContact = async (): Promise<ContactInfo[]> => {
+    try {
+      const response = await GET('/api/contacto');
+      if (!response.ok) {
+        console.error('Error al cargar el contacto:', response.status, response.statusText);
+        return [];
+      }
+
+      const responseData = await response.json();
+      if (!responseData) {
+        console.warn('La respuesta está vacía');
+        return [];
+      }
+
+      if (Array.isArray(responseData)) {
+        return responseData as ContactInfo[];
+      }
+
+      if (responseData.data && Array.isArray(responseData.data)) {
+        return responseData.data as ContactInfo[];
+      }
+
+      console.warn('Formato de respuesta inesperado:', responseData);
+      return [];
+
+    } catch (error) {
+      console.error('Error cargando el contacto:', error);
+      return [];
+    }
+  };
+
+
+
+
+
+  // Función para guardar los datos del administrador en el estado y localStorage
   const saveAdminData = (newData: AdminData) => {
     setAdminData(newData);
     localStorage.setItem('transportadora_admin_data', JSON.stringify(newData));
@@ -119,12 +232,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveAdminData(newData);
   };
 
-  const updateContact = (contact: ContactInfo) => {
+  const updateContact = (contact: ContactInfo[]) => {
     const newData = { ...adminData, contact };
     saveAdminData(newData);
   };
 
-  const updateSchedule = (schedule: Schedule) => {
+  const updateSchedule = (schedule: Schedule[]) => {
     const newData = { ...adminData, schedule };
     saveAdminData(newData);
   };
@@ -134,6 +247,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     saveAdminData(newData);
   };
 
+  // Cargar datos iniciales
   return (
     <AdminContext.Provider value={{
       isAuthenticated,

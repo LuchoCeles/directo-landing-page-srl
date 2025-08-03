@@ -1,0 +1,59 @@
+const backendurl = import.meta.env.VITE_LOCAL_API_URL;
+
+export async function POST(url, data, isFormData = false) {
+  const config = {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+    },
+    body: isFormData ? data : JSON.stringify(data)
+  };
+
+  if (!isFormData) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return await fetch(backendurl + url, config);
+}
+export async function GET(url, data) {
+  const queryString = data ? `?${new URLSearchParams(data).toString()}` : "";
+
+  return await fetch(backendurl + url + queryString, {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+    }
+  });
+};
+
+
+export async function PATCH(url, data, isFormData = false) {
+  const config = {
+    method: 'PATCH',
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+    },
+    body: isFormData ? data : JSON.stringify(data)
+  };
+  
+  if (!isFormData) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return await fetch(backendurl + url, config);
+}
+
+export async function DELETE(url, data) {
+  const objString = '?' + new URLSearchParams(data).toString();
+
+  return await fetch(backendurl + url + objString, {
+    method: 'DELETE',
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('transportadora_admin_auth')}`
+    },
+  });
+}

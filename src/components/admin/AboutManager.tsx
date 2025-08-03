@@ -5,24 +5,36 @@ import { Textarea } from "@/components/ui/textarea";
 import { Save, Edit, Eye } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { useToast } from "@/hooks/use-toast";
-
+import { PATCH } from "../../services/fetch.js"
 const AboutManager = () => {
   const { adminData, updateAbout } = useAdmin();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(adminData.about.content);
+  const [editContent, setEditContent] = useState(adminData.about);
 
-  const handleSave = () => {
-    updateAbout({ content: editContent });
-    setIsEditing(false);
-    toast({
-      title: "Contenido actualizado",
-      description: "La sección 'Sobre Nosotros' ha sido actualizada correctamente",
-    });
+  const handleSave = async () => {
+    try {
+      const response = await PATCH("/admin/about", editContent);
+      if (response.ok) {
+        setEditContent(adminData.about);
+        updateAbout(editContent);
+        setIsEditing(false);
+        toast({
+          title: "Contenido actualizado",
+          description: "La sección 'Sobre Nosotros' ha sido actualizada correctamente",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo actualizar el elemento del carrusel",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancel = () => {
-    setEditContent(adminData.about.content);
+    setEditContent(adminData.about);
     setIsEditing(false);
   };
 
@@ -30,23 +42,25 @@ const AboutManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-foreground">Gestión de "Sobre Nosotros"</h3>
-        <Button 
-          onClick={() => setIsEditing(!isEditing)}
-          variant={isEditing ? "outline" : "default"}
-          className="flex items-center space-x-2"
-        >
-          {isEditing ? (
-            <>
-              <Eye className="w-4 h-4" />
-              <span>Vista Previa</span>
-            </>
-          ) : (
-            <>
-              <Edit className="w-4 h-4" />
-              <span>Editar Contenido</span>
-            </>
-          )}
-        </Button>
+        {isEditing ? (
+          <Button
+            onClick={() => setIsEditing(!isEditing)}
+            variant={isEditing ? "outline" : "default"}
+            className="flex items-center space-x-2"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Vista Previa</span>
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setIsEditing(!isEditing)}
+            variant={isEditing ? "outline" : "default"}
+            className="flex items-center space-x-2"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Editar Contenido</span>
+          </Button>
+        )}
       </div>
 
       <Card className="shadow-card-custom">
@@ -62,8 +76,8 @@ const AboutManager = () => {
                   Contenido (use saltos de línea para separar párrafos)
                 </label>
                 <Textarea
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
+                  value={editContent.content}
+                  onChange={(e) => setEditContent({ ...editContent, content: e.target.value })}
                   rows={12}
                   className="font-mono text-sm"
                   placeholder="Escriba el contenido de la sección 'Sobre Nosotros'..."
@@ -78,8 +92,8 @@ const AboutManager = () => {
                   <Save className="w-4 h-4" />
                   <span>Guardar Cambios</span>
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleCancel}
                   className="flex items-center space-x-2"
                 >
@@ -100,13 +114,6 @@ const AboutManager = () => {
                   ))}
                 </div>
               </div>
-
-              <div className="text-center">
-                <Button onClick={() => setIsEditing(true)} className="flex items-center space-x-2 mx-auto">
-                  <Edit className="w-4 h-4" />
-                  <span>Editar Contenido</span>
-                </Button>
-              </div>
             </div>
           )}
         </CardContent>
@@ -121,7 +128,7 @@ const AboutManager = () => {
           <ul className="space-y-2 text-sm">
             <li>• Mantenga un tono profesional y corporativo</li>
             <li>• Incluya información sobre experiencia y trayectoria</li>
-            <li>• Mencione las ciudades donde operan (Rosario - Mar del Plata)</li>
+            <li>• Mencione las ciudades donde operan</li>
             <li>• Destaque los valores de la empresa (puntualidad, seguridad, confiabilidad)</li>
             <li>• Use párrafos cortos para mejor legibilidad</li>
             <li>• Evite tecnicismos excesivos, mantenga claridad</li>
