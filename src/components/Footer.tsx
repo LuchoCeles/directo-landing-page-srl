@@ -4,6 +4,9 @@ import { useAdmin } from "@/contexts/AdminContext";
 const Footer = () => {
   const { adminData } = useAdmin();
   const currentYear = new Date().getFullYear();
+  
+  // Safety check: ensure contact is an array  
+  const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
 
   return (
     <footer className="bg-transport-gray text-white py-12">
@@ -52,11 +55,11 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Contacto</h4>
             <div className="space-y-2 text-white/80 text-sm">
-              {(adminData.contact as unknown as any[]).map((contact, index) => (
+              {contactArray.map((contact, index) => (
                 <p key={contact.id || index}>📍 <strong>{contact.sucursal}:</strong> {contact.telefono}</p>
               ))}
-              {(adminData.contact as unknown as any[]).length > 0 && (
-                <p>✉️ {(adminData.contact as unknown as any[])[0].email}</p>
+              {contactArray.length > 0 && (
+                <p>✉️ {contactArray[0]?.email}</p>
               )}
             </div>
           </div>

@@ -4,8 +4,11 @@ import { useAdmin } from "@/contexts/AdminContext";
 
 const Branches = () => {
   const { adminData } = useAdmin();
+  
+  // Safety check: ensure contact is an array
+  const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
 
-  const branches = (adminData.contact as unknown as any[]).map(contact => ({
+  const branches = contactArray.map(contact => ({
     city: contact.sucursal || "Sin nombre",
     address: contact.address,
     phone: contact.telefono

@@ -5,8 +5,11 @@ import { useAdmin } from "@/contexts/AdminContext";
 const Schedule = () => {
   const { adminData } = useAdmin();
   
+  // Safety check: ensure schedule is an array
+  const scheduleArray = Array.isArray(adminData.schedule) ? adminData.schedule : [];
+  
   // Group schedules by sucursal
-  const groupedSchedules = (adminData.schedule as unknown as any[]).reduce((acc, schedule) => {
+  const groupedSchedules = scheduleArray.reduce((acc, schedule) => {
     if (!acc[schedule.sucursal]) {
       acc[schedule.sucursal] = [];
     }

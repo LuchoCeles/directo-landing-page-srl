@@ -8,30 +8,33 @@ import { useAdmin } from "@/contexts/AdminContext";
 const Contact = () => {
   const { adminData } = useAdmin();
   
+  // Safety check: ensure contact is an array
+  const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
+  
   const contactInfo = [
-    ...(adminData.contact as unknown as any[]).map(contact => ({
+    ...contactArray.map(contact => ({
       icon: Phone,
       title: contact.sucursal || "Sucursal",
       content: contact.telefono,
       action: `tel:${contact.telefono.replace(/\s/g, '')}`
     })),
-    ...((adminData.contact as unknown as any[]).length > 0 ? [{
+    ...(contactArray.length > 0 ? [{
       icon: Mail,
       title: "Email",
-      content: (adminData.contact as unknown as any[])[0].email,
-      action: `mailto:${(adminData.contact as unknown as any[])[0].email}`
+      content: contactArray[0]?.email || "",
+      action: `mailto:${contactArray[0]?.email || ""}`
     }] : []),
-    ...((adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp ? [{
+    ...(contactArray.length > 0 && contactArray[0]?.whatsapp ? [{
       icon: MessageCircle,
       title: "WhatsApp",
       content: "Contacto directo",
-      action: `https://wa.me/${(adminData.contact as unknown as any[])[0].whatsapp.replace(/\+/g, '')}`
+      action: `https://wa.me/${contactArray[0]?.whatsapp?.replace(/\+/g, '') || ""}`
     }] : [])
   ];
 
   const handleWhatsAppClick = () => {
-    if ((adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp) {
-      const whatsappNumber = (adminData.contact as unknown as any[])[0].whatsapp.replace(/\+/g, '');
+    if (contactArray.length > 0 && contactArray[0]?.whatsapp) {
+      const whatsappNumber = contactArray[0].whatsapp.replace(/\+/g, '');
       window.open(`https://wa.me/${whatsappNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
     }
   };
@@ -75,7 +78,7 @@ const Contact = () => {
             </div>
 
             {/* WhatsApp CTA */}
-            {(adminData.contact as unknown as any[]).length > 0 && (adminData.contact as unknown as any[])[0].whatsapp && (
+            {contactArray.length > 0 && contactArray[0]?.whatsapp && (
               <div className="mt-8">
                 <Button
                   onClick={handleWhatsAppClick}
@@ -97,7 +100,7 @@ const Contact = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {(adminData.contact as unknown as any[]).map((contact, index) => (
+                {contactArray.map((contact, index) => (
                   <div key={contact.id || index}>
                     <h4 className="font-semibold text-foreground">📍 {contact.sucursal}</h4>
                     <p className="text-muted-foreground text-sm">
