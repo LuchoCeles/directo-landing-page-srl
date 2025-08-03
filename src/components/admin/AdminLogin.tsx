@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Truck, User } from "lucide-react";
@@ -12,6 +13,8 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAdmin();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +30,8 @@ const AdminLogin = () => {
         title: "Acceso autorizado",
         description: "Bienvenido al panel administrativo",
       });
+      const from = location.state?.from?.pathname || "/admin";
+      navigate(from, { replace: true });
     } else {
       toast({
         title: "Acceso denegado",
