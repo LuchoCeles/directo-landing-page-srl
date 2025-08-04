@@ -37,9 +37,9 @@ const Contact = () => {
               Información de Contacto
             </h3>
 
-            <div className="flex items-start gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {contactArray.map((sucursal, index) => (
-                <Card key={index} className="shadow-card-custom hover:shadow-elegant transition-all duration-300">
+                <Card key={index} className="shadow-card-custom hover:shadow-elegant transition-all duration-300 w-full">
                   <CardHeader>
                     <CardTitle className="text-xl text-foreground">
                      📍 {sucursal.sucursal || "Sucursal"}
@@ -47,8 +47,8 @@ const Contact = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-start gap-4">
-                      <MapPin className="w-5 h-5 mt-1 text-primary" />
-                      <div>
+                      <MapPin className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
+                      <div className="flex-1">
                         <h4 className="font-medium text-foreground">Dirección</h4>
                         <p className="text-muted-foreground text-sm">
                           {sucursal.address || "No especificada"}
@@ -58,8 +58,8 @@ const Contact = () => {
 
                     {sucursal.telefono && (
                       <div className="flex items-start gap-4">
-                        <Phone className="w-5 h-5 mt-1 text-primary" />
-                        <div>
+                        <Phone className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
+                        <div className="flex-1">
                           <h4 className="font-medium text-foreground">Teléfono</h4>
                           <span className="text-muted-foreground text-sm">
                             {sucursal.telefono}
@@ -70,8 +70,8 @@ const Contact = () => {
 
                     {sucursal.email && (
                       <div className="flex items-start gap-4">
-                        <Mail className="w-5 h-5 mt-1 text-primary" />
-                        <div>
+                        <Mail className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
+                        <div className="flex-1">
                           <h4 className="font-medium text-foreground">Email</h4>
                           <a
                             href={`mailto:${sucursal.email}`}
@@ -85,8 +85,8 @@ const Contact = () => {
 
                     {sucursal.whatsapp && (
                       <div className="flex items-start gap-4">
-                        <MessageCircle className="w-5 h-5 mt-1 text-primary" />
-                        <div>
+                        <MessageCircle className="w-5 h-5 mt-1 text-primary flex-shrink-0" />
+                        <div className="flex-1">
                           <h4 className="font-medium text-foreground">WhatsApp</h4>
                           <button
                             onClick={() => handleWhatsAppClick(sucursal.whatsapp)}
