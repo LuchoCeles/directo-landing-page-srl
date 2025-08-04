@@ -7,9 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { POST } from "../services/fetch.js";
 import { Mail } from "@/types/admin.js";
 
-// Constante para el cooldown (5 minutos en milisegundos)
-const COOLDOWN_TIME = 5 * 60 * 1000;
-
 const ContactForm = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<Mail>({
@@ -21,31 +18,27 @@ const ContactForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Mail>>({});
-  const [lastSubmissionTime, setLastSubmissionTime] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState<number>(0);
 
-  // Efecto para manejar el contador regresivo
-  useEffect(() => {
-    if (!lastSubmissionTime) return;
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const elapsed = now - lastSubmissionTime;
-      const remaining = COOLDOWN_TIME - elapsed;
-
-      if (remaining <= 0) {
-        setTimeLeft(0);
-        clearInterval(interval);
-      } else {
-        setTimeLeft(remaining);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [lastSubmissionTime]);
+  // Función para manejar cambios en el campo de teléfono
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    // Permite solo números, signo + y espacios
+    const cleanedValue = value.replace(/[^\d+ ]/g, '');
+    setFormData(prev => ({
+      ...prev,
+      phone: cleanedValue
+    }));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    // Si es el campo de teléfono, usar la función especial
+    if (name === 'phone') {
+      handlePhoneChange(e as React.ChangeEvent<HTMLInputElement>);
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -69,28 +62,21 @@ const ContactForm = () => {
     }
     if (!formData.message.trim()) newErrors.message = "Mensaje es requerido";
 
+    // Validación opcional para teléfono si se requiere
+    if (formData.phone && !/^[\d+][\d ]+$/.test(formData.phone)) {
+      newErrors.phone = "Teléfono solo puede contener números y signo +";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
-    // Verificar cooldown
-    const now = Date.now();
-    if (lastSubmissionTime && (now - lastSubmissionTime) < COOLDOWN_TIME) {
-      toast({
-        title: "Espere un momento",
-        description: `Por favor espere ${Math.ceil(timeLeft / 1000 / 60)} minutos antes de enviar otro mensaje.`,
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsSubmitting(true);
-
     try {
       const response = await POST("/api/mail", formData);
 
@@ -107,9 +93,7 @@ const ContactForm = () => {
           phone: "",
           message: ""
         });
-        
-        // Establecer el tiempo del último envío
-        setLastSubmissionTime(Date.now());
+
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "Error al enviar el mensaje");
@@ -153,7 +137,6 @@ const ContactForm = () => {
                   onChange={handleChange}
                   placeholder="Su nombre completo"
                   className="border-border focus:ring-primary"
-                  disabled={isSubmitting || timeLeft > 0}
                 />
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
               </div>
@@ -167,7 +150,6 @@ const ContactForm = () => {
                   onChange={handleChange}
                   placeholder="Nombre de la empresa"
                   className="border-border focus:ring-primary"
-                  disabled={isSubmitting || timeLeft > 0}
                 />
               </div>
             </div>
@@ -183,7 +165,6 @@ const ContactForm = () => {
                 onChange={handleChange}
                 placeholder="correo@empresa.com"
                 className="border-border focus:ring-primary"
-                disabled={isSubmitting || timeLeft > 0}
               />
               {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
@@ -199,8 +180,9 @@ const ContactForm = () => {
                 onChange={handleChange}
                 placeholder="+54 XXX XXX-XXXX"
                 className="border-border focus:ring-primary"
-                disabled={isSubmitting || timeLeft > 0}
+                inputMode="numeric" // Muestra teclado numérico en dispositivos móviles
               />
+              {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
             </div>
 
             <div className="space-y-2 mt-2">
@@ -214,7 +196,6 @@ const ContactForm = () => {
                 placeholder="Describa su consulta o requerimiento..."
                 rows={5}
                 className="border-border focus:ring-primary resize-none"
-                disabled={isSubmitting || timeLeft > 0}
               />
               {errors.message && <p className="text-sm text-red-500">{errors.message}</p>}
             </div>
@@ -223,17 +204,9 @@ const ContactForm = () => {
               type="submit"
               size="lg"
               className="w-full bg-primary hover:bg-primary/90 shadow-elegant mt-4"
-              disabled={isSubmitting || timeLeft > 0}
             >
-              {timeLeft > 0 ? `Espere ${formatTimeLeft(timeLeft)}` : 
-               isSubmitting ? "Enviando..." : "Enviar Mensaje"}
+              {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
             </Button>
-
-            {timeLeft > 0 && (
-              <p className="text-sm text-muted-foreground mt-2 text-center">
-                Para prevenir spam, puedes enviar otro mensaje en {formatTimeLeft(timeLeft)}
-              </p>
-            )}
 
             <p className="text-xs text-muted-foreground mt-4">
               * Campos obligatorios. Sus datos serán tratados de forma confidencial.
