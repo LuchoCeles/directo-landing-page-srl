@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X } from "lucide-react";
+import { Menu, Truck } from "lucide-react";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -30,8 +30,8 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? "bg-background/95 backdrop-blur-sm shadow-elegant border-b border-border"
-          : "bg-transparent"
+        ? "bg-background/95 backdrop-blur-sm shadow-elegant border-b border-border"
+        : "bg-transparent"
         }`}
     >
       <div className="container mx-auto px-4 py-4">
@@ -39,7 +39,9 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">TD</span>
+              <span className="text-primary-foreground font-bold text-lg">
+                <Truck />
+              </span>
             </div>
             <div className="flex flex-col">
               <h1 className="text-xl font-bold text-foreground">
