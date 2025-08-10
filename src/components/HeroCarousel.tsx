@@ -82,12 +82,6 @@ const HeroCarousel = () => {
             <p className="text-xl md:text-2xl mb-8 text-white/90">
               {carouselData[currentIndex]?.description || ""}
             </p>
-            <Button
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg shadow-elegant"
-            >
-              Conocer más
-            </Button>
           </div>
         </div>
       </div>
