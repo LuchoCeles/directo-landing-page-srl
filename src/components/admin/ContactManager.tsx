@@ -31,7 +31,6 @@ const ContactManager = () => {
     });
   };
 
-  // Obtener solo los contactos modificados
   const getModifiedContacts = () => {
     return editContacts.filter((contact, index) => {
       const originalContact = originalContacts[index];
@@ -152,7 +151,7 @@ const ContactManager = () => {
                       type="email"
                       value={contact.email || ''}
                       onChange={(e) => updateField(contact.id, 'email', e.target.value)}
-                      placeholder="sucursal@transporteedirecto.com"
+                      placeholder="sucursal@transporte.com"
                     />
                   </div>
 
@@ -164,7 +163,7 @@ const ContactManager = () => {
                     <Input
                       value={contact.whatsapp || ''}
                       onChange={(e) => updateField(contact.id, 'whatsapp', e.target.value)}
-                      placeholder="+543414397465"
+                      placeholder="+54123123123"
                     />
                   </div>
 

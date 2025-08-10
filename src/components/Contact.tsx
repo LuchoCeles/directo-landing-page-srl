@@ -1,7 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MessageCircle, MapPin } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import ContactForm from "./ContactForm";
@@ -9,7 +6,6 @@ import ContactForm from "./ContactForm";
 const Contact = () => {
   const { adminData } = useAdmin();
 
-  // Safety check: ensure contact is an array
   const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
 
   const handleWhatsAppClick = (whatsappNumber: string) => {

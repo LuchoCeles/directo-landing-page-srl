@@ -15,13 +15,11 @@ const ScheduleManager = () => {
   const [editSchedule, setEditSchedule] = useState<Schedule[]>(adminData.schedule);
   const [originalSchedule, setOriginalSchedule] = useState<Schedule[]>(adminData.schedule);
 
-  
   const handleSave = async () => {
     try {
-      // Filtrar solo los horarios modificados
-      const modifiedSchedules = editSchedule.filter((schedule, index) => {
-        return schedule.horario !== originalSchedule[index].horario;
-      });
+      const modifiedSchedules = editSchedule
+        .filter((schedule, index) => schedule.horario !== originalSchedule[index].horario)
+        .map(({ id, dia, horario }) => ({ id, dia, horario }));
 
       if (modifiedSchedules.length === 0) {
         setIsEditing(false);
@@ -31,13 +29,14 @@ const ScheduleManager = () => {
         });
       }
 
+      console.log(modifiedSchedules);
       const response = await PATCH('/admin/horarios', { 
         schedules: modifiedSchedules 
       });
 
       if (response.ok) {
         updateSchedule(editSchedule);
-        setOriginalSchedule(editSchedule); // Actualizar la referencia original
+        setOriginalSchedule(editSchedule);
         setIsEditing(false);
         toast({
           title: "Horarios actualizados",
@@ -61,24 +60,25 @@ const ScheduleManager = () => {
     setIsEditing(false);
   };
 
-  const updateLocationSchedule = (sucursal: string, dia: string, value: string) => {
+  const updateLocationSchedule = (id: number, value: string) => {
     setEditSchedule(prev =>
       prev.map(schedule =>
-        schedule.sucursal === sucursal && schedule.dia === dia
+        schedule.id === id
           ? { ...schedule, horario: value }
           : schedule
       )
     );
   };
 
-  // Agrupar horarios por sucursal
   const getSucursalesUnicas = () => {
     const sucursales = editSchedule.map(s => s.sucursal);
-    return [...new Set(sucursales)];
+    return sucursales.filter((sucursal, index, self) => 
+      index === self.findIndex(s => s.id === sucursal.id)
+    );
   };
 
-  const getHorariosPorSucursal = (sucursal: string) => {
-    return editSchedule.filter(s => s.sucursal === sucursal);
+  const getHorariosPorSucursal = (sucursalId: number) => {
+    return editSchedule.filter(s => s.sucursal.id === sucursalId);
   };
 
   return (
@@ -105,25 +105,25 @@ const ScheduleManager = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         {getSucursalesUnicas().map((sucursal) => {
-          const horarios = getHorariosPorSucursal(sucursal);
+          const horarios = getHorariosPorSucursal(sucursal.id);
 
           return (
-            <Card key={sucursal} className="shadow-card-custom">
+            <Card key={sucursal.id} className="shadow-card-custom">
               <CardHeader className="flex justify-between items-start">
                 <CardTitle className="flex items-center space-x-2">
                   <Clock className="w-5 h-5 text-primary" />
-                  <span>📍 {sucursal}</span>
+                  <span>📍 {sucursal.nombre}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing ? (
                   <div className="space-y-4">
                     {horarios.map((horario) => (
-                      <div key={`${sucursal}-${horario.dia}`} className="space-y-2">
+                      <div key={horario.id} className="space-y-2">
                         <label className="text-sm font-medium">{horario.dia}</label>
                         <Input
                           value={horario.horario}
-                          onChange={(e) => updateLocationSchedule(sucursal, horario.dia, e.target.value)}
+                          onChange={(e) => updateLocationSchedule(horario.id, e.target.value)}
                           placeholder="Ej: 08:00 – 16:00"
                         />
                       </div>
@@ -132,7 +132,7 @@ const ScheduleManager = () => {
                 ) : (
                   <div className="space-y-3">
                     {horarios.map((horario) => (
-                      <div key={`${sucursal}-${horario.dia}`} className="flex justify-between items-center py-2 border-b border-border">
+                      <div key={horario.id} className="flex justify-between items-center py-2 border-b border-border">
                         <span className="font-medium">{horario.dia}</span>
                         <span className={horario.horario === 'Cerrado' ?
                           'text-destructive font-semibold' : 'text-primary font-semibold'}>

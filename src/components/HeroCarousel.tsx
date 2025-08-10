@@ -9,7 +9,6 @@ const HeroCarousel = () => {
   const [carouselData, setCarouselData] = useState<CarouselItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Actualizar el estado cuando adminData.carousel cambie
   useEffect(() => {
     if (adminData.carousel && adminData.carousel.length > 0) {
       setCarouselData(adminData.carousel);
@@ -43,7 +42,6 @@ const HeroCarousel = () => {
     setCurrentIndex(index);
   };
 
-  // Mostrar un loader si no hay datos
   if (carouselData.length === 0) {
     return (
       <section id="inicio" className="relative h-screen bg-gray-100 flex items-center justify-center">

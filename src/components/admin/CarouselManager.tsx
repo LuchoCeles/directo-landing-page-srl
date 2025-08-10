@@ -20,7 +20,6 @@ const CarouselManager = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Detectar cambios en el ítem que se está editando
   const hasChanges = () => {
     if (!editingItem || !originalEditingItem) return false;
 
@@ -31,14 +30,13 @@ const CarouselManager = () => {
     );
   };
 
-  // Cuando se selecciona un ítem para editar, guardar su estado original
   useEffect(() => {
     if (editingItem) {
       setOriginalEditingItem({ ...editingItem });
     }
   }, [editingItem]);
 
-  // Manejar errores de carga de imágenes
+
   const handleImageError = (id: string) => {
     setImageErrors(prev => ({ ...prev, [id]: true }));
   };
@@ -47,7 +45,6 @@ const CarouselManager = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tipo de archivo
     if (!file.type.match('image.*')) {
       toast({
         title: "Error",
@@ -126,7 +123,6 @@ const CarouselManager = () => {
   const handleUpdate = async () => {
     if (!editingItem) return;
 
-    // Verificar si hay cambios antes de enviar
     if (!hasChanges()) {
       toast({
         title: "Sin cambios",
@@ -210,7 +206,6 @@ const CarouselManager = () => {
     [newCarousel[currentIndex], newCarousel[targetIndex]] =
       [newCarousel[targetIndex], newCarousel[currentIndex]];
 
-    // Actualizar el order
     newCarousel.forEach((item, index) => {
       item.order = index + 1;
     });

@@ -20,7 +20,6 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular delay de autenticación
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const success = login(user, password);
@@ -54,7 +53,7 @@ const AdminLogin = () => {
           <div>
             <CardTitle className="text-2xl">Panel Administrativo</CardTitle>
             <p className="text-muted-foreground mt-2">
-              Transportadora El Directo SRL
+              Transporte SRL
             </p>
           </div>
         </CardHeader>

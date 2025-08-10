@@ -19,10 +19,8 @@ const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Mail>>({});
 
-  // Función para manejar cambios en el campo de teléfono
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    // Permite solo números, signo + y espacios
     const cleanedValue = value.replace(/[^\d+ ]/g, '');
     setFormData(prev => ({
       ...prev,
@@ -32,8 +30,6 @@ const ContactForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    // Si es el campo de teléfono, usar la función especial
     if (name === 'phone') {
       handlePhoneChange(e as React.ChangeEvent<HTMLInputElement>);
       return;
@@ -43,7 +39,7 @@ const ContactForm = () => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user types
+
     if (errors[name as keyof Mail]) {
       setErrors(prev => ({
         ...prev,
@@ -62,7 +58,6 @@ const ContactForm = () => {
     }
     if (!formData.message.trim()) newErrors.message = "Mensaje es requerido";
 
-    // Validación opcional para teléfono si se requiere
     if (formData.phone && !/^[\d+][\d ]+$/.test(formData.phone)) {
       newErrors.phone = "Teléfono solo puede contener números y signo +";
     }
@@ -109,12 +104,6 @@ const ContactForm = () => {
     }
   };
 
-  // Función para formatear el tiempo restante
-  const formatTimeLeft = (ms: number) => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
 
   return (
     <div>
@@ -180,7 +169,7 @@ const ContactForm = () => {
                 onChange={handleChange}
                 placeholder="+54 XXX XXX-XXXX"
                 className="border-border focus:ring-primary"
-                inputMode="numeric" // Muestra teclado numérico en dispositivos móviles
+                inputMode="numeric"
               />
               {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
             </div>

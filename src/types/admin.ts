@@ -25,10 +25,13 @@ export interface Mail {
 }
 
 export interface Schedule {
-  id?: string;
-  sucursal: string;
+  id: number;
   dia: string;
   horario: string;
+  sucursal: {
+    id: number;
+    nombre: string;
+  };
 }
 
 export interface AboutContent {

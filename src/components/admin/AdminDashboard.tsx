@@ -25,7 +25,7 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Panel Administrativo</h1>
-              <p className="text-muted-foreground">Transportadora El Directo SRL</p>
+              <p className="text-muted-foreground">Transporte SRL</p>
             </div>
             <Button
               variant="outline"

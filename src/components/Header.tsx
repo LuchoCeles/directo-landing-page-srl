@@ -24,7 +24,7 @@ const Header = () => {
         block: "start"
       });
     }
-    setIsMobileMenuOpen(false); // Cerrar menú móvil después de navegar
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -45,7 +45,7 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <h1 className="text-xl font-bold text-foreground">
-                Transportadora El Directo
+                Transporte
               </h1>
               <span className="text-sm text-muted-foreground">SRL</span>
             </div>

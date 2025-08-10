@@ -1,26 +1,35 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, MapPin } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
+import { Schedule } from "@/types/admin";
 
-const Schedule = () => {
+interface GroupedSchedule {
+  city: string;
+  schedule: {
+    days: string;
+    hours: string;
+  }[];
+}
+
+const Schedules = () => {
   const { adminData } = useAdmin();
-  
-  // Safety check: ensure schedule is an array
-  const scheduleArray = Array.isArray(adminData.schedule) ? adminData.schedule : [];
-  
-  // Group schedules by sucursal
-  const groupedSchedules = scheduleArray.reduce((acc, schedule) => {
-    if (!acc[schedule.sucursal]) {
-      acc[schedule.sucursal] = [];
-    }
-    acc[schedule.sucursal].push(schedule);
-    return acc;
-  }, {} as Record<string, typeof adminData.schedule>);
 
-  const schedules = Object.entries(groupedSchedules).map(([city, scheduleList]) => ({
+  const scheduleArray: Schedule[] = Array.isArray(adminData.schedule) ? adminData.schedule : [];
+
+  // Agrupar horarios por sucursal
+  const groupedSchedules = scheduleArray.reduce((acc: Record<string, Schedule[]>, schedule) => {
+    const sucursalNombre = schedule.sucursal.nombre;
+    if (!acc[sucursalNombre]) {
+      acc[sucursalNombre] = [];
+    }
+    acc[sucursalNombre].push(schedule);
+    return acc;
+  }, {});
+
+  // Formatear datos para la vista
+  const schedules: GroupedSchedule[] = Object.entries(groupedSchedules).map(([city, scheduleList]) => ({
     city,
-    icon: MapPin,
-    schedule: (scheduleList as any[]).map(s => ({
+    schedule: scheduleList.map(s => ({
       days: s.dia,
       hours: s.horario
     }))
@@ -56,11 +65,10 @@ const Schedule = () => {
                     <span className="font-medium text-foreground">
                       {item.days}
                     </span>
-                    <span className={`font-semibold ${
-                      item.hours === "Cerrado" 
-                        ? "text-destructive" 
-                        : "text-primary"
-                    }`}>
+                    <span className={`font-semibold ${item.hours === "Cerrado"
+                      ? "text-destructive"
+                      : "text-primary"
+                      }`}>
                       {item.hours}
                     </span>
                   </div>
@@ -74,4 +82,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default Schedules;

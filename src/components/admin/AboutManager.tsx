@@ -14,19 +14,16 @@ const AboutManager = () => {
   const [editContent, setEditContent] = useState(adminData.about);
   const [originalContent, setOriginalContent] = useState(adminData.about);
 
-  // Inicializar estados cuando cambian los datos del admin
   useEffect(() => {
     setEditContent(adminData.about);
     setOriginalContent(adminData.about);
   }, [adminData.about]);
 
-  // Verificar si hay cambios entre el contenido editado y el original
   const hasChanges = () => {
     return editContent.content !== originalContent.content;
   };
 
   const handleSave = async () => {
-    // Verificar si hay cambios antes de enviar
     if (!hasChanges()) {
       toast({
         title: "Sin cambios",
@@ -65,7 +62,6 @@ const AboutManager = () => {
 
   const toggleEditMode = () => {
     if (isEditing && hasChanges()) {
-      // Preguntar antes de descartar cambios
       if (confirm("¿Estás seguro de que deseas descartar los cambios?")) {
         handleCancel();
       }

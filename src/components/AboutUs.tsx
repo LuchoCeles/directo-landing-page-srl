@@ -41,11 +41,11 @@ const AboutUs = () => {
           <div className="space-y-6">
             {adminData.about.content.split('\n\n').map((paragraph, index) => (
               <p key={index} className="text-lg text-muted-foreground leading-relaxed">
-                {paragraph.includes('Transporte El Directo SRL') ? (
+                {paragraph.includes('Transporte SRL') ? (
                   <>
-                    {paragraph.split('Transporte El Directo SRL')[0]}
-                    <strong className="text-foreground">Transportadora El Directo SRL</strong>
-                    {paragraph.split('Transporte El Directo SRL')[1]}
+                    {paragraph.split('Transporte SRL')[0]}
+                    <strong className="text-foreground">Transporte SRL</strong>
+                    {paragraph.split('Transporte SRL')[1]}
                   </>
                 ) : (
                   paragraph

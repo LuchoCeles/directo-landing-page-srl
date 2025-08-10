@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AdminData, CarouselItem, ContactInfo, Schedule, AboutContent } from '@/types/admin';
 import { GET, POST } from '@/services/fetch';
 
+
 interface AdminContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -31,18 +32,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [adminData, setAdminData] = useState<AdminData>(defaultAdminData);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verificar autenticación al cargar
   useEffect(() => {
     const token = localStorage.getItem('transportadora_admin_token');
+    loadInitialData();
     if (token) {
       setIsAuthenticated(true);
-      loadInitialData();
     } else {
       setIsLoading(false);
     }
   }, []);
 
-  // Cargar datos cuando está autenticado
   const loadInitialData = async () => {
     try {
       setIsLoading(true);
@@ -52,7 +51,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         getSchedule(),
         getAbout()
       ]);
-      
+
+      console.log({ carousel, contact, schedule, about });
       setAdminData({ carousel, contact, schedule, about });
 
     } catch (error) {
@@ -62,14 +62,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Funciones de autenticación
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
       const response = await POST('/admin/login', { username, password });
-      
+
       if (!response.ok) return false;
-      
+
       const data = await response.json();
       if (data.token) {
         localStorage.setItem('transportadora_admin_token', data.token);
@@ -88,11 +87,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const logout = () => {
     localStorage.removeItem('transportadora_admin_token');
+    localStorage.removeItem('transportadora_data');
     setAdminData(defaultAdminData);
     setIsAuthenticated(false);
   };
 
-  // Funciones para obtener datos
   const getCarouselItem = async (): Promise<CarouselItem[]> => {
     try {
       const response = await POST('/api/carrusel');
@@ -140,7 +139,6 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Funciones para actualizar datos
   const updateAdminData = (newData: Partial<AdminData>) => {
     const updatedData = { ...adminData, ...newData };
     setAdminData(updatedData);
@@ -163,6 +161,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updateContact,
       updateSchedule,
       updateAbout
+
     }}>
       {children}
     </AdminContext.Provider>

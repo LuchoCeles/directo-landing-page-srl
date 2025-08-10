@@ -5,7 +5,6 @@ const Footer = () => {
   const { adminData } = useAdmin();
   const currentYear = new Date().getFullYear();
   
-  // Safety check: ensure contact is an array  
   const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
 
   return (
@@ -19,7 +18,7 @@ const Footer = () => {
                 <Truck className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Transportadora El Directo</h3>
+                <h3 className="text-xl font-bold">Transporte</h3>
                 <span className="text-sm text-white/80">SRL</span>
               </div>
             </div>
@@ -69,7 +68,7 @@ const Footer = () => {
         <div className="border-t border-white/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-white/60 text-sm">
-              © {currentYear} Transportadora El Directo SRL. Todos los derechos reservados.
+              © {currentYear} Transporte SRL. Todos los derechos reservados.
             </p>
             <div className="flex space-x-6 text-sm text-white/60">
               <a href="#" className="hover:text-white transition-colors">

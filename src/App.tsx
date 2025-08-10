@@ -7,7 +7,7 @@ import { AdminProvider } from "@/contexts/AdminContext";
 import { ProtectedRoute } from "./components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
-import AdminLogin from "./pages/Admin"; // Asegúrate de tener este componente
+import AdminLogin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

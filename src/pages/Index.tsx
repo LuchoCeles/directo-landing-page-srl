@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import AboutUs from "@/components/AboutUs";
 import Branches from "@/components/Branches";
-import Schedule from "@/components/Schedule";
+import Schedules from "@/components/Schedules";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -14,7 +14,7 @@ const Index = () => {
         <HeroCarousel />
         <AboutUs />
         <Branches />
-        <Schedule />
+        <Schedules />
         <Contact />
       </main>
       <Footer />
