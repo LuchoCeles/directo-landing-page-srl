@@ -8,6 +8,7 @@ import { useAdmin } from "@/contexts/AdminContext";
 import { CarouselItem } from "@/types/admin";
 import { useToast } from "@/hooks/use-toast";
 import { POST, PATCH, DELETE } from "../../services/fetch.js";
+import { json } from "stream/consumers";
 
 const CarouselManager = () => {
   const { adminData, updateCarousel } = useAdmin();
@@ -124,15 +125,6 @@ const CarouselManager = () => {
   const handleUpdate = async () => {
     if (!editingItem) return;
 
-    if (!hasChanges()) {
-      toast({
-        title: "Sin cambios",
-        description: "No se detectaron cambios para guardar",
-      });
-      setEditingItem(null);
-      return;
-    }
-
     const formData = new FormData();
     if (editingItem.imageFile) {
       formData.append('image', editingItem.imageFile);
@@ -140,25 +132,24 @@ const CarouselManager = () => {
     formData.append('id', editingItem.id);
     formData.append('title', editingItem.title);
     formData.append('description', editingItem.description || '');
-    formData.append('imageURL', newItem.image);
-    
+
     try {
       const response = await PATCH('/admin/carrusel/update', formData, true);
 
       if (response.ok) {
-        const updatedItem = await response.json();
-        const updatedCarousel = adminData.carousel.map(item =>
-          item.id === updatedItem.id ? updatedItem : item
-        );
-        updateCarousel(updatedCarousel);
+        const responseData = await response.json();
+        const updatedItem = responseData.data || responseData;
+
+        updatedItem.image = `${updatedItem.image}?${Date.now()}`;
+
+        updateCarousel(adminData.carousel.map(item =>
+          item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+        ));
         setEditingItem(null);
         toast({
           title: "Elemento actualizado",
           description: "La imagen del carrusel ha sido actualizada",
         });
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al actualizar elemento');
       }
     } catch (error) {
       toast({

@@ -51,8 +51,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         getSchedule(),
         getAbout()
       ]);
-
-      console.log({ carousel, contact, schedule, about });
+      
       setAdminData({ carousel, contact, schedule, about });
 
     } catch (error) {
