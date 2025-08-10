@@ -91,9 +91,10 @@ const CarouselManager = () => {
     }
 
     const formData = new FormData();
-    formData.append('imageFile', newItem.imageFile);
+    formData.append('image', newItem.imageFile);
     formData.append('title', newItem.title);
     formData.append('description', newItem.description);
+    formData.append('imageURL', newItem.image);
 
     try {
       const response = await POST('/admin/carrusel', formData, true);
@@ -134,12 +135,13 @@ const CarouselManager = () => {
 
     const formData = new FormData();
     if (editingItem.imageFile) {
-      formData.append('imageFile', editingItem.imageFile);
+      formData.append('image', editingItem.imageFile);
     }
     formData.append('id', editingItem.id);
     formData.append('title', editingItem.title);
     formData.append('description', editingItem.description || '');
-
+    formData.append('imageURL', newItem.image);
+    
     try {
       const response = await PATCH('/admin/carrusel/update', formData, true);
 
