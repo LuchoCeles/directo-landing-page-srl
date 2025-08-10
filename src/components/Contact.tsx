@@ -9,7 +9,7 @@ const Contact = () => {
   const contactArray = Array.isArray(adminData.contact) ? adminData.contact : [];
 
   const handleWhatsAppClick = (whatsappNumber: string) => {
-    const cleanedNumber = whatsappNumber.replace(/\+/g, '');
+    const cleanedNumber = whatsappNumber.replace(/\D/g, '');
     window.open(`https://wa.me/${cleanedNumber}?text=Hola,%20me%20interesa%20conocer%20sus%20servicios%20de%20transporte`, "_blank");
   };
 
@@ -38,7 +38,7 @@ const Contact = () => {
                 <Card key={index} className="shadow-card-custom hover:shadow-elegant transition-all duration-300 w-full">
                   <CardHeader>
                     <CardTitle className="text-xl text-foreground">
-                     📍 {sucursal.sucursal || "Sucursal"}
+                      📍 {sucursal.sucursal || "Sucursal"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
