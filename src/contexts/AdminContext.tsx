@@ -33,7 +33,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('transportadora_admin_token');
+    const token = localStorage.getItem('admin_token');
     loadInitialData();
     if (token) {
       setIsAuthenticated(true);
@@ -70,7 +70,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       const data = await response.json();
       if (data.token) {
-        localStorage.setItem('transportadora_admin_token', data.token);
+        localStorage.setItem('admin_token', data.token);
         setIsAuthenticated(true);
         await loadInitialData();
         return true;
@@ -85,8 +85,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const logout = () => {
-    localStorage.removeItem('transportadora_admin_token');
-    localStorage.removeItem('transportadora_data');
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('data_token');
     setAdminData(defaultAdminData);
     setIsAuthenticated(false);
   };
@@ -141,7 +141,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateAdminData = (newData: Partial<AdminData>) => {
     const updatedData = { ...adminData, ...newData };
     setAdminData(updatedData);
-    localStorage.setItem('transportadora_data', JSON.stringify(updatedData));
+    localStorage.setItem('data_token', JSON.stringify(updatedData));
   };
 
   const updateCarousel = (carousel: CarouselItem[]) => updateAdminData({ carousel });

@@ -1,35 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
-import { Schedule } from "@/types/admin";
+import { Schedule as ScheduleType } from "@/types/admin";
 
-interface GroupedSchedule {
-  city: string;
-  schedule: {
-    days: string;
-    hours: string;
-  }[];
-}
-
-const Schedules = () => {
+const Schedule = () => {
   const { adminData } = useAdmin();
 
-  const scheduleArray: Schedule[] = Array.isArray(adminData.schedule) ? adminData.schedule : [];
+  const scheduleArray = Array.isArray(adminData.schedule) ? adminData.schedule : [];
 
-  // Agrupar horarios por sucursal
-  const groupedSchedules = scheduleArray.reduce((acc: Record<string, Schedule[]>, schedule) => {
-    const sucursalNombre = schedule.sucursal.nombre;
+  const groupedSchedules = scheduleArray.reduce((acc, schedule) => {
+    const sucursalNombre = schedule.sucursal?.nombre || 'Sin sucursal';
     if (!acc[sucursalNombre]) {
       acc[sucursalNombre] = [];
     }
     acc[sucursalNombre].push(schedule);
     return acc;
-  }, {});
+  }, {} as Record<string, ScheduleType[]>);
 
-  // Formatear datos para la vista
-  const schedules: GroupedSchedule[] = Object.entries(groupedSchedules).map(([city, scheduleList]) => ({
+  const schedules = Object.entries(groupedSchedules).map(([city, scheduleList]) => ({
     city,
-    schedule: scheduleList.map(s => ({
+    icon: MapPin,
+    schedule: (scheduleList as ScheduleType[]).map(s => ({
       days: s.dia,
       hours: s.horario
     }))
@@ -82,4 +73,4 @@ const Schedules = () => {
   );
 };
 
-export default Schedules;
+export default Schedule;

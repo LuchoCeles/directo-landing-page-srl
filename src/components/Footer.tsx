@@ -33,10 +33,10 @@ const Footer = () => {
             <h4 className="text-lg font-semibold">Contacto</h4>
             <div className="space-y-2 text-white/80 text-sm">
               {contactArray.map((contact, index) => (
-                <>
-                  <p key={contact.id || index}>📍 <strong>{contact.sucursal}:</strong> {contact.telefono}</p>
-                  <p>✉️ {contact.email}</p>
-                </>
+                <div key={index}>
+                  <p>📍 <strong>{contact.sucursal}:</strong> {contact.telefono}</p>
+                  <p>✉️ {contact.email}</p >
+                </div>
               ))}
             </div>
           </div>
@@ -59,7 +59,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
+    </footer >
   );
 };
 
