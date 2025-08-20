@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Settings, Image, Info, Clock, Phone } from "lucide-react";
+import { LogOut, Settings, Image, Info, Clock, Phone, BarChart3 } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import CarouselManager from "./CarouselManager";
 import AboutManager from "./AboutManager";
 import ContactManager from "./ContactManager";
 import ScheduleManager from "./ScheduleManager";
+import AnalyticsManager from "./AnalyticsManager";
 
 const AdminDashboard = () => {
   const { logout, adminData } = useAdmin();
@@ -90,7 +91,7 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="carousel" className="flex items-center space-x-2">
                   <Image className="w-4 h-4" />
                   <span>Carrusel</span>
@@ -106,6 +107,10 @@ const AdminDashboard = () => {
                 <TabsTrigger value="contact" className="flex items-center space-x-2">
                   <Phone className="w-4 h-4" />
                   <span>Contacto</span>
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Métricas</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -123,6 +128,10 @@ const AdminDashboard = () => {
 
               <TabsContent value="contact" className="mt-6">
                 <ContactManager />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-6">
+                <AnalyticsManager />
               </TabsContent>
             </Tabs>
           </CardContent>
