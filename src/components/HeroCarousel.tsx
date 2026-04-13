@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -23,8 +23,12 @@ const carouselData = [
   },
 ];
 
+const SWIPE_THRESHOLD = 50;
+
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const dragStart = useRef<number | null>(null);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,29 +37,51 @@ const HeroCarousel = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const goToPrevious = () => {
-    setCurrentIndex(currentIndex === 0 ? carouselData.length - 1 : currentIndex - 1);
+  const goToPrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? carouselData.length - 1 : prev - 1));
+  }, []);
+
+  const goToNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev === carouselData.length - 1 ? 0 : prev + 1));
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    dragStart.current = e.clientX;
+    isDragging.current = true;
   };
 
-  const goToNext = () => {
-    setCurrentIndex(currentIndex === carouselData.length - 1 ? 0 : currentIndex + 1);
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging.current || dragStart.current === null) return;
+    const diff = e.clientX - dragStart.current;
+    if (Math.abs(diff) > SWIPE_THRESHOLD) {
+      if (diff < 0) goToNext();
+      else goToPrevious();
+    }
+    dragStart.current = null;
+    isDragging.current = false;
   };
 
   return (
-    <section id="inicio" className="relative h-screen overflow-hidden">
-      <div className="relative w-full h-full">
+    <section
+      id="inicio"
+      className="relative h-screen overflow-hidden select-none cursor-grab active:cursor-grabbing"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={() => { dragStart.current = null; isDragging.current = false; }}
+    >
+      <div className="relative w-full h-full pointer-events-none">
         {carouselData.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? "opacity-100" : "opacity-0"}`}
           >
-            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" draggable={false} />
             <div className="absolute inset-0 bg-black/40" />
           </div>
         ))}
       </div>
 
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="container mx-auto px-4 text-center text-white">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
@@ -68,14 +94,14 @@ const HeroCarousel = () => {
         </div>
       </div>
 
-      <Button variant="ghost" size="icon" onClick={goToPrevious} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12">
+      <Button variant="ghost" size="icon" onClick={goToPrevious} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 pointer-events-auto">
         <ChevronLeft className="w-8 h-8" />
       </Button>
-      <Button variant="ghost" size="icon" onClick={goToNext} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12">
+      <Button variant="ghost" size="icon" onClick={goToNext} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 pointer-events-auto">
         <ChevronRight className="w-8 h-8" />
       </Button>
 
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 pointer-events-auto">
         {carouselData.map((_, index) => (
           <button
             key={index}
