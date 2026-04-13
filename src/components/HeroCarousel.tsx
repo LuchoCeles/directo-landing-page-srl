@@ -23,22 +23,30 @@ const carouselData = [
   },
 ];
 
-const SWIPE_THRESHOLD = 80;
+const SWIPE_THRESHOLD = 60;
 
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartX = useRef<number | null>(null);
+  const startXRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
   const sectionRef = useRef<HTMLElement>(null);
 
+  // Auto-advance: uses a ref for isDragging to avoid restarting the interval on every drag
+  const isDraggingRef2 = useRef(false);
   useEffect(() => {
-    if (isDragging) return;
+    isDraggingRef2.current = isDragging;
+  }, [isDragging]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev === carouselData.length - 1 ? 0 : prev + 1));
+      if (!isDraggingRef2.current) {
+        setCurrentIndex((prev) => (prev === carouselData.length - 1 ? 0 : prev + 1));
+      }
     }, 6000);
     return () => clearInterval(interval);
-  }, [isDragging]);
+  }, []); // stable — never restarts
 
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? carouselData.length - 1 : prev - 1));
@@ -48,151 +56,184 @@ const HeroCarousel = () => {
     setCurrentIndex((prev) => (prev === carouselData.length - 1 ? 0 : prev + 1));
   }, []);
 
-  const getAdjacentIndex = (direction: "next" | "prev") => {
-    if (direction === "next") return currentIndex === carouselData.length - 1 ? 0 : currentIndex + 1;
-    return currentIndex === 0 ? carouselData.length - 1 : currentIndex - 1;
+  const getAdjacentIndex = (direction: "next" | "prev", base: number) => {
+    if (direction === "next") return base === carouselData.length - 1 ? 0 : base + 1;
+    return base === 0 ? carouselData.length - 1 : base - 1;
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    dragStartX.current = e.clientX;
+  // ── Touch handlers (mobile) ──────────────────────────────────────────────
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startXRef.current = e.touches[0].clientX;
+    isDraggingRef.current = true;
     setIsDragging(true);
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDraggingRef.current || startXRef.current === null) return;
+    setDragOffset(e.touches[0].clientX - startXRef.current);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDraggingRef.current) return;
+    setDragOffset((offset) => {
+      if (Math.abs(offset) > SWIPE_THRESHOLD) {
+        offset < 0 ? goToNext() : goToPrevious();
+      }
+      return 0;
+    });
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    startXRef.current = null;
+  };
+
+  // ── Pointer handlers (desktop mouse) ────────────────────────────────────
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") return; // let touch handlers deal with it
+    startXRef.current = e.clientX;
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || dragStartX.current === null) return;
-    const diff = e.clientX - dragStartX.current;
-    setDragOffset(diff);
+    if (e.pointerType === "touch" || !isDraggingRef.current || startXRef.current === null) return;
+    setDragOffset(e.clientX - startXRef.current);
   };
 
-  const handlePointerEnd = () => {
-    if (!isDragging) return;
-    if (Math.abs(dragOffset) > SWIPE_THRESHOLD) {
-      if (dragOffset < 0) goToNext();
-      else goToPrevious();
-    }
-    setDragOffset(0);
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") return;
+    if (!isDraggingRef.current) return;
+    setDragOffset((offset) => {
+      if (Math.abs(offset) > SWIPE_THRESHOLD) {
+        offset < 0 ? goToNext() : goToPrevious();
+      }
+      return 0;
+    });
+    isDraggingRef.current = false;
     setIsDragging(false);
-    dragStartX.current = null;
+    startXRef.current = null;
   };
 
-  // Calculate how much of the next/prev slide to reveal (0 to 1)
-  const revealProgress = Math.min(Math.abs(dragOffset) / (sectionRef.current?.offsetWidth || 1000), 1);
+  // ── Slide positioning ────────────────────────────────────────────────────
+  const sectionWidth = sectionRef.current?.offsetWidth || 1000;
+  const revealProgress = Math.min(Math.abs(dragOffset) / sectionWidth, 1);
   const draggingDirection = dragOffset < 0 ? "next" : "prev";
-  const incomingIndex = dragOffset < 0 ? getAdjacentIndex("next") : getAdjacentIndex("prev");
+  const incomingIndex =
+    dragOffset < 0
+      ? getAdjacentIndex("next", currentIndex)
+      : getAdjacentIndex("prev", currentIndex);
+
+  const getSlideStyle = (index: number): React.CSSProperties => {
+    if (!isDragging || dragOffset === 0) {
+      const isActive = index === currentIndex;
+      return {
+        opacity: isActive ? 1 : 0,
+        transform: "translateX(0%)",
+        zIndex: isActive ? 10 : 0,
+        visibility: isActive ? "visible" : "hidden",
+        transition: "opacity 1000ms ease",
+      };
+    }
+
+    if (index === currentIndex) {
+      return {
+        opacity: 1,
+        transform: `translateX(${dragOffset}px)`,
+        zIndex: 10,
+        visibility: "visible",
+        transition: "none",
+      };
+    }
+
+    if (index === incomingIndex) {
+      const startPercent = draggingDirection === "next" ? 100 : -100;
+      return {
+        opacity: 1,
+        transform: `translateX(${startPercent * (1 - revealProgress)}%)`,
+        zIndex: 20,
+        visibility: "visible",
+        transition: "none",
+      };
+    }
+
+    return { opacity: 0, zIndex: 0, visibility: "hidden", transition: "none" };
+  };
 
   return (
     <section
       id="inicio"
       ref={sectionRef}
-      className="relative h-screen overflow-hidden select-none cursor-grab active:cursor-grabbing"
+      className="relative h-screen overflow-hidden select-none"
+      style={{ touchAction: "pan-y" }}
+      // Touch (mobile)
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+      // Pointer (desktop mouse)
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerEnd}
-      onPointerLeave={handlePointerEnd}
+      onPointerUp={handlePointerUp}
     >
-      {/* Slides */}
-      <div className="relative w-full h-full pointer-events-none">
-        {carouselData.map((slide, index) => {
-          let translateX = "0%";
-          let opacity = index === currentIndex ? 1 : 0;
-          let zIndex = index === currentIndex ? 10 : 0;
-
-          if (isDragging && dragOffset !== 0) {
-            if (index === currentIndex) {
-              // Current slide moves with drag
-              translateX = `${dragOffset}px`;
-              opacity = 1 - revealProgress * 0.3;
-              zIndex = 10;
-            } else if (index === incomingIndex) {
-              // Incoming slide enters from the side
-              const startPos = draggingDirection === "next" ? 100 : -100;
-              const currentPos = startPos * (1 - revealProgress);
-              translateX = `${currentPos}%`;
-              opacity = 0.4 + revealProgress * 0.6;
-              zIndex = 20;
-            }
-          }
-
-          const isActive = index === currentIndex || (isDragging && index === incomingIndex);
-
-          return (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 ${!isDragging ? "transition-opacity duration-1000" : ""}`}
-              style={{
-                opacity,
-                transform: `translateX(${translateX})`,
-                zIndex,
-                transition: isDragging ? "none" : undefined,
-                visibility: isActive ? "visible" : "hidden",
-              }}
-            >
-              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" draggable={false} />
-              <div className="absolute inset-0 bg-black/40" />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Text overlay */}
-      <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{
-          opacity: isDragging ? 1 - revealProgress : 1,
-          transform: isDragging ? `translateX(${dragOffset * 0.5}px)` : undefined,
-          transition: isDragging ? "none" : "opacity 0.5s ease",
-        }}
-      >
-        <div className="container mx-auto px-4 text-center text-white">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              {carouselData[currentIndex]?.title}
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/90">
-              {carouselData[currentIndex]?.description}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Incoming text overlay */}
-      {isDragging && dragOffset !== 0 && (
+      {carouselData.map((slide, index) => (
         <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{
-            opacity: revealProgress,
-            transform: `translateX(${(draggingDirection === "next" ? 30 : -30) * (1 - revealProgress)}px)`,
-          }}
+          key={slide.id}
+          className="absolute inset-0"
+          style={getSlideStyle(index)}
         >
-          <div className="container mx-auto px-4 text-center text-white">
-            <div className="max-w-4xl mx-auto">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                {carouselData[incomingIndex]?.title}
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 text-white/90">
-                {carouselData[incomingIndex]?.description}
-              </p>
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-cover"
+            draggable={false}
+          />
+          <div className="absolute inset-0 bg-black/40" />
+
+          {/* Text moves with the slide */}
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="container mx-auto px-6 text-center text-white">
+              <div className="max-w-4xl mx-auto">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
+                  {slide.title}
+                </h1>
+                <p className="text-xl md:text-2xl mb-8 text-white/90 drop-shadow">
+                  {slide.description}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      ))}
 
-      {/* Navigation buttons */}
-      <Button variant="ghost" size="icon" onClick={goToPrevious} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 pointer-events-auto z-30">
+      {/* Navigation arrows — desktop only */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={goToPrevious}
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 z-30 cursor-pointer"
+      >
         <ChevronLeft className="w-8 h-8" />
       </Button>
-      <Button variant="ghost" size="icon" onClick={goToNext} className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 pointer-events-auto z-30">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={goToNext}
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 w-12 h-12 z-30 cursor-pointer"
+      >
         <ChevronRight className="w-8 h-8" />
       </Button>
 
       {/* Dots */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 pointer-events-auto z-30">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
         {carouselData.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex
+                ? "bg-white scale-125"
+                : "bg-white/50 hover:bg-white/75"
+            }`}
           />
         ))}
       </div>

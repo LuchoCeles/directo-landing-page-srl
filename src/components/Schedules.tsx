@@ -5,17 +5,19 @@ const schedules = [
   {
     city: "Rosario",
     schedule: [
-      { days: "Lunes a Viernes", hours: "08:00 - 17:00" },
-      { days: "Sábados", hours: "08:00 - 12:00" },
+      { days: "Lunes a Viernes", hours: "07:30 - 15:30" },
+      { days: "Sábados", hours: "07:30 - 12:00" },
       { days: "Domingos", hours: "Cerrado" },
+      { days: "Feriados", hours: "Cerrado" },
     ],
   },
   {
     city: "Mar del Plata",
     schedule: [
-      { days: "Lunes a Viernes", hours: "08:00 - 17:00" },
+      { days: "Lunes a Viernes", hours: "08:00 - 16:00" },
       { days: "Sábados", hours: "08:00 - 12:00" },
       { days: "Domingos", hours: "Cerrado" },
+      { days: "Feriados", hours: "Cerrado" },
     ],
   },
 ];
