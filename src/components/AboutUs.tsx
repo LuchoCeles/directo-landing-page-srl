@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Truck, Shield, Clock, Award } from "lucide-react";
 
-const aboutContent = `Transporte SRL es una empresa con más de 60 años de trayectoria en el transporte de cargas entre las ciudades de Rosario y Mar del Plata. Desde nuestros inicios, nos hemos comprometido con brindar un servicio confiable, seguro y eficiente.
+const aboutContent = `Transportadora El Directo es una empresa con más de 60 años de trayectoria en el transporte de cargas entre las ciudades de Rosario y Mar del Plata. Desde nuestros inicios, nos hemos comprometido con brindar un servicio confiable, seguro y eficiente.
 
 Contamos con una flota moderna y un equipo humano altamente capacitado, lo que nos permite garantizar la integridad de cada envío y cumplir con los plazos de entrega establecidos.`;
 
@@ -25,11 +25,11 @@ const AboutUs = () => {
           <div className="space-y-6">
             {aboutContent.split('\n\n').map((paragraph, index) => (
               <p key={index} className="text-lg text-muted-foreground leading-relaxed">
-                {paragraph.includes('Transporte SRL') ? (
+                {paragraph.includes('Transportadora El Directo') ? (
                   <>
-                    {paragraph.split('Transporte SRL')[0]}
-                    <strong className="text-foreground">Transporte SRL</strong>
-                    {paragraph.split('Transporte SRL')[1]}
+                    {paragraph.split('Transportadora El Directo')[0]}
+                    <strong className="text-foreground">Transportadora El Directo</strong>
+                    {paragraph.split('Transportadora El Directo')[1]}
                   </>
                 ) : paragraph}
               </p>

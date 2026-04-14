@@ -45,9 +45,9 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <h1 className="text-xl font-bold text-foreground">
-                Transporte
+                Transportadora El Directo
               </h1>
-              <span className="text-sm text-muted-foreground">SRL</span>
+              <span className="text-sm text-black">SRL</span>
             </div>
           </div>
 

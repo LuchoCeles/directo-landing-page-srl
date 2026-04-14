@@ -18,7 +18,7 @@ const Footer = () => {
                 <Truck className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Transporte</h3>
+                <h3 className="text-xl font-bold">Transportadora El Directo</h3>
                 <span className="text-sm text-white/80">SRL</span>
               </div>
             </div>
